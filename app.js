@@ -24,17 +24,16 @@ const setMe = n => { try { n ? localStorage.setItem("me", n) : localStorage.remo
 // ---- themes ----
 function initThemes() {
   const el = $("themes");
-  const render = () => { el.innerHTML = THEMES.map(([k, n]) =>
-    `<button data-t="${k}" aria-pressed="${document.documentElement.dataset.theme === k}">${n}</button>`).join(""); };
-  el.addEventListener("click", e => {
-    const t = e.target.dataset && e.target.dataset.t;
-    if (!t) return;
-    document.documentElement.dataset.theme = t;
-    try { localStorage.setItem("theme", t); } catch (err) {}
-    render();
+  el.innerHTML = `<select aria-label="Theme">${THEMES.map(([k, n]) =>
+    `<option value="${k}"${document.documentElement.dataset.theme === k ? " selected" : ""}>${n}</option>`).join("")}</select>`;
+  el.firstChild.addEventListener("change", e => {
+    document.documentElement.dataset.theme = e.target.value;
+    try { localStorage.setItem("theme", e.target.value); } catch (err) {}
   });
-  render();
 }
+
+// Debug extras (build stamp) show only on a local server, or anywhere with ?debug in the URL.
+const DEBUG = /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname) || /[?&]debug\b/.test(location.search);
 
 // ---- data ----
 const getJSON = u => fetch(u, { cache: "no-store" }).then(r => r.ok ? r.json() : null);
@@ -446,9 +445,9 @@ initThemes();
 loadSeason().then(ctx => {
   CTX = ctx;
   const upd = ctx.wins.updated ? ` · updated ${new Date(ctx.wins.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
-  $("sub").innerHTML = `${esc(ctx.season)} · regular season${esc(upd)}<span id="build"></span>`;
+  $("sub").innerHTML = `${esc(ctx.season)} · regular season${esc(upd)}${DEBUG ? '<span id="build"></span>' : ""}`;
   render();
-  stampBuild();
+  if (DEBUG) stampBuild();
 }).catch(e => {
   $("sub").textContent = "";
   $("app").innerHTML = `<div class="err">Could not load data (${esc(e.message)}). Serve this folder over http, e.g. <code>python3 -m http.server</code>.</div>`;
