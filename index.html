@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NFL Wins Pool</title>
 <script>
+  // Themes: add a [data-theme="key"] block in style.css and one entry here.
+  var THEMES = [["terminal", "Terminal"], ["broadcast", "Broadcast"], ["brutalist", "Brutalist"]];
   // Set the theme before first paint: ?theme=… beats the saved choice, then OS preference.
   (function () {
-    var themes = ["terminal", "broadcast", "brutalist"], t;
+    var keys = THEMES.map(function (t) { return t[0]; }), t;
     try { t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("theme"); } catch (e) {}
-    if (themes.indexOf(t) < 0) t = matchMedia("(prefers-color-scheme: light)").matches ? "brutalist" : "terminal";
+    if (keys.indexOf(t) < 0) t = matchMedia("(prefers-color-scheme: light)").matches ? "brutalist" : "terminal";
     document.documentElement.dataset.theme = t;
   })();
 </script>
@@ -26,7 +28,6 @@
   <div class="legend"><i style="color:var(--promo)">▌</i> promotion zone &nbsp; <i style="color:var(--rel)">▌</i> relegation zone &nbsp; · &nbsp; 🔥 most wins in a week &nbsp; 💩 fewest &nbsp; · &nbsp; ties broken by historic win %</div>
 </main>
 <script>
-const THEMES = [["terminal", "Terminal"], ["broadcast", "Broadcast"], ["brutalist", "Brutalist"]];
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const money = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(0);
 
