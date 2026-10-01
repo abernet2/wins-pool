@@ -10,7 +10,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 - **Resource pages (read-only).** A hash-routed page per resource, so every view is linkable: season `#/2026-27`, league `#/2026-27/league/1`, player `#/player/Jack`, team `#/team/Buffalo`. Names in tables become links.
   - Needs per-season data folders (`data/<season>/league.json|wins.json|weeks.json`) and a `data/seasons.json` index; the importer and fetch script take a season argument.
   - Player page: seasons played, league and finish per season, 🔥/💩 totals, money, best and worst picks. Team page: wins per season and who drafted it.
-  - Past seasons need backfilling from the old sheets (not yet provided).
+  - Past seasons are loaded; season and Hall of Fame pages are still to do. Past seasons have final records only (no per-week results).
 - **Hall of Fame / Shame.** Across all seasons: highest and lowest season win %, most and fewest wins, most titles and relegations, most 🔥/💩, best and worst weeks (4-0 or 0-4), best and worst picks, longest streaks.
 - **"Log in" as a person.** Choose a name once (saved in the browser, no auth). Highlights your row everywhere and opens your player page by default. Depends on resource pages.
 - **Weekly projections.** See how you and others are slated to perform in the coming week, and how that changes the standings.
@@ -50,6 +50,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Done
 
+- Past seasons (2018-19 to 2025-26) imported from the workbook with `scripts/import_workbook.py` (needs openpyxl). Player pages show career totals, a previous-seasons table (league, finish, record, teams) and a teams-drafted frequency table.
 - Per-season data folders (`data/<season>/`), hash router, first-pass player, team and league pages, and an "I'm me" button on player pages (saved in the browser; highlights your row and adds a ★ link in the header).
 - Dense side-by-side layout with a switchable theme system (Terminal, Broadcast, Brutalist). Tokens live in `style.css`; `?theme=` in the URL or the header switcher picks one, and the choice is remembered.
 - Season view with draft order and standings for both leagues (2026-27).

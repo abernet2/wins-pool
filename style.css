@@ -125,3 +125,8 @@ button:hover { border-color: var(--accent); color: var(--accent); }
 .chip.w { background: var(--heat-hi); } .chip.l { background: var(--heat-lo); } .chip.t { background: var(--heat-mid); }
 .chip.bye, .chip.pend { color: var(--muted); border: var(--rule) solid var(--line); line-height: 1.4; }
 .chips.big .chip { width: 2.2em; font-size: 12px; margin-bottom: 4px; }
+
+td.wrap { white-space: normal; line-height: 1.6; }
+.mv { font-size: 10px; } .mv.up { color: var(--promo); } .mv.dn { color: var(--rel); }
+tr.champ td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.gap { margin-top: 6px; }

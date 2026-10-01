@@ -32,12 +32,18 @@ async function loadSeason() {
   const idx = await getJSON("data/seasons.json");
   const season = idx.current;
   const [league, wins, weeks] = await Promise.all(["league", "wins", "weeks"].map(f => getJSON(`data/${season}/${f}.json`)));
-  const ctx = { idx, season, league, wins, teams: wins.teams, weeks: weeks ? weeks.weeks : {} };
+  const ctx = { idx, season, league, wins, teams: wins.teams, weeks: weeks ? weeks.weeks : {}, all: {} };
   ctx.byLeague = {};
   league.leagues.forEach(lg => {
     const c = computeLeague(lg, ctx.teams);
     ctx.byLeague[lg.id] = { lg, c, co: computeCallouts(lg, ctx.weeks), ranks: rankHistory(lg, ctx.weeks) };
   });
+  // Every season's draft and final records, for history pages.
+  await Promise.all(idx.seasons.map(async sn => {
+    if (sn === season) return ctx.all[sn] = { league, teams: wins.teams };
+    const [lg, w] = await Promise.all([getJSON(`data/${sn}/league.json`), getJSON(`data/${sn}/wins.json`)]);
+    if (lg && w) ctx.all[sn] = { league: lg, teams: w.teams };
+  }));
   return ctx;
 }
 
@@ -200,54 +206,118 @@ function findOwner(ctx, name) {
   return null;
 }
 
+// Every season an owner played: league, final rank, record, and their teams (newest first).
+function ownerHistory(ctx, name) {
+  const rows = [];
+  Object.keys(ctx.all).sort().reverse().forEach(season => {
+    const S = ctx.all[season], live = season === ctx.season;
+    S.league.leagues.forEach(lg => {
+      const o = lg.owners.find(x => x.name === name);
+      if (!o) return;
+      const teams = lg.picks.filter(p => p.owner === name).map(p => ({ team: p.team, pick: p.pick, rec: S.teams[p.team] || { w: 0, l: 0, t: 0 } }));
+      const w = teams.reduce((n, t) => n + t.rec.w, 0), l = teams.reduce((n, t) => n + t.rec.l, 0), t = teams.reduce((n, x) => n + x.rec.t, 0);
+      const g = w + l + t;
+      const row = live ? ctx.byLeague[lg.id].c.rows.find(r => r.name === name) : null;
+      rows.push({ season, live, lg: lg.id, of: lg.owners.length, teams, w, l, t, pct: g ? w / g : 0,
+        rank: row ? row.rank : o.rank, net: row ? row.net : o.net,
+        move: row ? (row.zone === "rel" ? "relegated" : row.zone === "promo" ? "promoted" : "") : (o.move || "") });
+    });
+  });
+  return rows;
+}
+
+const recStr = r => `${r.w}-${r.l}${r.t ? "-" + r.t : ""}`;
+const shortYear = s => "'" + s.slice(2, 4);
+
+function historyTable(hist) {
+  const body = hist.map(h => {
+    const mv = h.move === "promoted" ? `<span class="mv up" title="Promoted">▲</span>` : h.move === "relegated" ? `<span class="mv dn" title="Relegated">▼</span>` : "";
+    const teams = h.teams.map(t => `${teamLink(t.team)} <span class="dim">${recStr(t.rec)}</span>`).join(" · ");
+    return `<tr class="${h.rank === 1 ? "champ" : ""}"><td class="l">${esc(h.season)}${h.live ? ` <span class="dim">(live)</span>` : ""}</td>
+      <td>${h.lg}</td><td>${h.rank === 1 ? "🏆 " : ""}#${h.rank}<span class="dim">/${h.of}</span> ${mv}</td>
+      <td>${recStr(h)}</td><td>${pct(h.pct)}</td><td class="l wrap">${teams}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th class="l">Season</th><th>Lg</th><th>Finish</th><th>Record</th><th>Win%</th><th class="l">Teams</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
+
+// How often an owner has drafted each team, across every season they played.
+function draftFrequency(hist) {
+  const m = {};
+  hist.forEach(h => h.teams.forEach(t => {
+    const e = m[t.team] ||= { team: t.team, n: 0, pickSum: 0, w: 0, l: 0, t: 0, seasons: [] };
+    e.n++; e.pickSum += t.pick; e.w += t.rec.w; e.l += t.rec.l; e.t += t.rec.t; e.seasons.push(h.season);
+  }));
+  return Object.values(m).sort((a, b) => b.n - a.n || a.pickSum / a.n - b.pickSum / b.n || a.team.localeCompare(b.team));
+}
+
+function frequencyTable(freq) {
+  const body = freq.map(e => `<tr><td class="l">${teamLink(e.team)}</td><td class="num"><b>${e.n}</b></td>
+    <td>${(e.pickSum / e.n).toFixed(1)}</td><td>${recStr(e)}</td>
+    <td class="l dim wrap">${e.seasons.slice().sort().map(shortYear).join(" ")}</td></tr>`).join("");
+  return `<table><thead><tr><th class="l">Team</th><th>Times</th><th>Avg pick</th><th>Their record</th><th class="l">Seasons</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
+
 function playerPage(ctx, name) {
+  const hist = ownerHistory(ctx, name);
+  if (!hist.length) return notFound("player");
   const f = findOwner(ctx, name);
-  if (!f) return notFound("player");
-  const { lg, row, co, ranks, c } = f;
   const me = getMe();
-  const mine = lg.picks.filter(p => p.owner === name);
-  const wkNums = co.nums;
   const meBtn = me === name
     ? `<span class="isme">★ This is you</span> <button data-me="">not me</button>`
     : `<button data-me="${esc(name)}">I'm ${esc(name)}</button>`;
-
   const stat = (label, val) => `<div class="stat"><span>${label}</span><b>${val}</b></div>`;
-  const stats = [
-    stat("Rank", `#${row.rank} <small>of ${c.rows.length}</small>`),
-    stat("Record", `${row.w}-${row.l}${row.t ? "-" + row.t : ""}`),
-    stat("Win %", pct(row.pct)),
-    stat("Hist %", pct(row.hist)),
-    stat("🔥", co.byOwner[name].fire), stat("💩", co.byOwner[name].poop),
-    stat("Net", money(row.net)),
+
+  // Career totals across every season in the data.
+  const cw = hist.reduce((n, h) => n + h.w, 0), cl = hist.reduce((n, h) => n + h.l, 0), ct = hist.reduce((n, h) => n + h.t, 0);
+  const done = hist.filter(h => !h.live);  // titles and moves count only once a season is over
+  const career = [
+    stat("Seasons", hist.length), stat("Titles", done.filter(h => h.rank === 1).length),
+    stat("Career", `${cw}-${cl}${ct ? "-" + ct : ""}`), stat("Win %", pct(cw / (cw + cl + ct))),
+    stat("Promoted", done.filter(h => h.move === "promoted").length), stat("Relegated", done.filter(h => h.move === "relegated").length),
   ].join("");
 
-  // Rank and wins by week
-  const rankCells = wkNums.map(n => `<td class="wk${co.weeks[n].complete ? "" : " live"}">${ranks[name][n] ? "#" + ranks[name][n] : "·"}</td>`).join("");
-  const winCells = wkNums.map(n => {
-    const i = co.weeks[n], w = co.byOwner[name].wins[n];
-    const mark = i.fire.includes(name) ? " 🔥" : i.poop.includes(name) ? " 💩" : "";
-    return `<td class="wk${i.complete ? "" : " live"}">${w}${mark}</td>`;
-  }).join("");
-  const th = wkNums.map(n => `<th class="wk">${n}</th>`).join("");
-
-  const teamRows = mine.map(p => {
-    const r = ctx.teams[p.team] || { w: 0, l: 0, t: 0 };
-    return `<tr><td class="dim">${p.pick}</td><td class="l">${teamLink(p.team)}</td>
-      <td>${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td><td class="l chips">${chipsFor(ctx, p.team)}</td></tr>`;
-  }).join("");
-
-  const zone = row.zone === "rel" ? `<span class="zone rel">relegation zone</span>` : row.zone === "promo" ? `<span class="zone promo">promotion zone</span>` : "";
-  return `<div class="crumbs"><a href="#/">Season ${esc(ctx.season)}</a> / <a href="#/league/${lg.id}">${esc(lg.name)}</a> / ${esc(name)}</div>
-    <section class="narrow">
-      <h2 class="player">${esc(name)} ${zone}<span class="who">${meBtn}</span></h2>
-      <div class="stats">${stats}</div>
-      <h3>${esc(ctx.season)} · ${esc(lg.name)}</h3>
-      <div class="tbl"><table><thead><tr><th class="l"></th>${th}</tr></thead><tbody>
+  let current = "", crumbs = `<a href="#/">Season ${esc(ctx.season)}</a> / ${esc(name)}`, zone = "";
+  if (f) {
+    const { lg, row, co, ranks, c } = f;
+    zone = row.zone === "rel" ? `<span class="zone rel">relegation zone</span>` : row.zone === "promo" ? `<span class="zone promo">promotion zone</span>` : "";
+    crumbs = `<a href="#/">Season ${esc(ctx.season)}</a> / <a href="#/league/${lg.id}">${esc(lg.name)}</a> / ${esc(name)}`;
+    const stats = [
+      stat("Rank", `#${row.rank} <small>of ${c.rows.length}</small>`), stat("Record", recStr(row)),
+      stat("Win %", pct(row.pct)), stat("Hist %", pct(row.hist)),
+      stat("🔥", co.byOwner[name].fire), stat("💩", co.byOwner[name].poop), stat("Net", money(row.net)),
+    ].join("");
+    const wkNums = co.nums;
+    const rankCells = wkNums.map(n => `<td class="wk${co.weeks[n].complete ? "" : " live"}">${ranks[name][n] ? "#" + ranks[name][n] : "·"}</td>`).join("");
+    const winCells = wkNums.map(n => {
+      const i = co.weeks[n], w = co.byOwner[name].wins[n];
+      const mark = i.fire.includes(name) ? " 🔥" : i.poop.includes(name) ? " 💩" : "";
+      return `<td class="wk${i.complete ? "" : " live"}">${w}${mark}</td>`;
+    }).join("");
+    const th = wkNums.map(n => `<th class="wk">${n}</th>`).join("");
+    const teamRows = lg.picks.filter(p => p.owner === name).map(p => {
+      const r = ctx.teams[p.team] || { w: 0, l: 0, t: 0 };
+      return `<tr><td class="dim">${p.pick}</td><td class="l">${teamLink(p.team)}</td>
+        <td>${recStr(r)}</td><td class="l chips">${chipsFor(ctx, p.team)}</td></tr>`;
+    }).join("");
+    current = `<h3>${esc(ctx.season)} · ${esc(lg.name)}</h3><div class="stats">${stats}</div>
+      <div class="tbl gap"><table><thead><tr><th class="l"></th>${th}</tr></thead><tbody>
         <tr><td class="l dim">Rank after week</td>${rankCells}</tr>
         <tr><td class="l dim">Wins in week</td>${winCells}</tr></tbody></table></div>
-      <h3>Teams</h3>
-      <div class="tbl"><table><thead><tr><th>Pick</th><th class="l">Team</th><th>Rec</th><th class="l">Results</th></tr></thead>
-        <tbody>${teamRows}</tbody></table></div>
+      <div class="tbl gap"><table><thead><tr><th>Pick</th><th class="l">Team</th><th>Rec</th><th class="l">Results</th></tr></thead>
+        <tbody>${teamRows}</tbody></table></div>`;
+  } else {
+    current = `<p class="dim">Not in the ${esc(ctx.season)} pool.</p>`;
+  }
+
+  return `<div class="crumbs">${crumbs}</div>
+    <section class="narrow">
+      <h2 class="player">${esc(name)} ${zone}<span class="who">${meBtn}</span></h2>
+      <div class="stats">${career}</div>
+      ${current}
+      <h3>Previous seasons</h3><div class="tbl">${historyTable(hist)}</div>
+      <h3>Teams drafted</h3><div class="tbl"><div class="scroll">${frequencyTable(draftFrequency(hist))}</div></div>
     </section>`;
 }
 

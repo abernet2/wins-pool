@@ -1,0 +1,165 @@
+{
+  "season": "2024-25",
+  "teams": {
+    "Arizona": {
+      "w": 8,
+      "l": 9,
+      "t": 0
+    },
+    "Atlanta": {
+      "w": 8,
+      "l": 9,
+      "t": 0
+    },
+    "Baltimore": {
+      "w": 12,
+      "l": 5,
+      "t": 0
+    },
+    "Buffalo": {
+      "w": 13,
+      "l": 4,
+      "t": 0
+    },
+    "Carolina": {
+      "w": 5,
+      "l": 12,
+      "t": 0
+    },
+    "Chicago": {
+      "w": 5,
+      "l": 12,
+      "t": 0
+    },
+    "Cincinnati": {
+      "w": 9,
+      "l": 8,
+      "t": 0
+    },
+    "Cleveland": {
+      "w": 3,
+      "l": 14,
+      "t": 0
+    },
+    "Dallas": {
+      "w": 7,
+      "l": 10,
+      "t": 0
+    },
+    "Denver": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "Detroit": {
+      "w": 15,
+      "l": 2,
+      "t": 0
+    },
+    "Green Bay": {
+      "w": 11,
+      "l": 6,
+      "t": 0
+    },
+    "Houston": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "Indianapolis": {
+      "w": 8,
+      "l": 9,
+      "t": 0
+    },
+    "Jacksonville": {
+      "w": 4,
+      "l": 13,
+      "t": 0
+    },
+    "Kansas City": {
+      "w": 15,
+      "l": 2,
+      "t": 0
+    },
+    "L.A. Chargers": {
+      "w": 11,
+      "l": 6,
+      "t": 0
+    },
+    "L.A. Rams": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "Las Vegas": {
+      "w": 4,
+      "l": 13,
+      "t": 0
+    },
+    "Miami": {
+      "w": 8,
+      "l": 9,
+      "t": 0
+    },
+    "Minnesota": {
+      "w": 14,
+      "l": 3,
+      "t": 0
+    },
+    "N.Y. Giants": {
+      "w": 3,
+      "l": 14,
+      "t": 0
+    },
+    "N.Y. Jets": {
+      "w": 5,
+      "l": 12,
+      "t": 0
+    },
+    "New England": {
+      "w": 4,
+      "l": 13,
+      "t": 0
+    },
+    "New Orleans": {
+      "w": 5,
+      "l": 12,
+      "t": 0
+    },
+    "Philadelphia": {
+      "w": 14,
+      "l": 3,
+      "t": 0
+    },
+    "Pittsburgh": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "San Francisco": {
+      "w": 6,
+      "l": 11,
+      "t": 0
+    },
+    "Seattle": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "Tampa Bay": {
+      "w": 10,
+      "l": 7,
+      "t": 0
+    },
+    "Tennessee": {
+      "w": 3,
+      "l": 14,
+      "t": 0
+    },
+    "Washington": {
+      "w": 12,
+      "l": 5,
+      "t": 0
+    }
+  }
+}

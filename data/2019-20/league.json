@@ -1,0 +1,225 @@
+{
+  "season": "2019-20",
+  "final": true,
+  "leagues": [
+    {
+      "id": 1,
+      "name": "League 1",
+      "buyIn": 5.0,
+      "relegate": 0,
+      "promote": 0,
+      "owners": [
+        {
+          "name": "Mark",
+          "draftSlot": 1,
+          "rank": 5,
+          "net": -5.0
+        },
+        {
+          "name": "Evans",
+          "draftSlot": 2,
+          "rank": 4,
+          "net": -5.0
+        },
+        {
+          "name": "Luis",
+          "draftSlot": 3,
+          "rank": 8,
+          "net": -5.0
+        },
+        {
+          "name": "Jack",
+          "draftSlot": 4,
+          "rank": 5,
+          "net": -5.0
+        },
+        {
+          "name": "Nicholas",
+          "draftSlot": 5,
+          "rank": 1,
+          "net": 15.0
+        },
+        {
+          "name": "Mykolas",
+          "draftSlot": 6,
+          "rank": 3,
+          "net": -5.0
+        },
+        {
+          "name": "Matt",
+          "draftSlot": 7,
+          "rank": 5,
+          "net": -5.0
+        },
+        {
+          "name": "Mike W",
+          "draftSlot": 8,
+          "rank": 1,
+          "net": 15.0
+        }
+      ],
+      "picks": [
+        {
+          "pick": 1,
+          "team": "Kansas City",
+          "owner": "Mark"
+        },
+        {
+          "pick": 2,
+          "team": "New England",
+          "owner": "Evans"
+        },
+        {
+          "pick": 3,
+          "team": "New Orleans",
+          "owner": "Luis"
+        },
+        {
+          "pick": 4,
+          "team": "Philadelphia",
+          "owner": "Jack"
+        },
+        {
+          "pick": 5,
+          "team": "L.A. Rams",
+          "owner": "Nicholas"
+        },
+        {
+          "pick": 6,
+          "team": "Pittsburgh",
+          "owner": "Mykolas"
+        },
+        {
+          "pick": 7,
+          "team": "L.A. Chargers",
+          "owner": "Matt"
+        },
+        {
+          "pick": 8,
+          "team": "Chicago",
+          "owner": "Mike W"
+        },
+        {
+          "pick": 9,
+          "team": "Seattle",
+          "owner": "Mike W"
+        },
+        {
+          "pick": 10,
+          "team": "Dallas",
+          "owner": "Matt"
+        },
+        {
+          "pick": 11,
+          "team": "Green Bay",
+          "owner": "Mykolas"
+        },
+        {
+          "pick": 12,
+          "team": "Baltimore",
+          "owner": "Nicholas"
+        },
+        {
+          "pick": 13,
+          "team": "Houston",
+          "owner": "Jack"
+        },
+        {
+          "pick": 14,
+          "team": "Atlanta",
+          "owner": "Luis"
+        },
+        {
+          "pick": 15,
+          "team": "Cleveland",
+          "owner": "Evans"
+        },
+        {
+          "pick": 16,
+          "team": "Carolina",
+          "owner": "Mark"
+        },
+        {
+          "pick": 17,
+          "team": "Las Vegas",
+          "owner": "Mark"
+        },
+        {
+          "pick": 18,
+          "team": "Minnesota",
+          "owner": "Evans"
+        },
+        {
+          "pick": 19,
+          "team": "Jacksonville",
+          "owner": "Luis"
+        },
+        {
+          "pick": 20,
+          "team": "Tampa Bay",
+          "owner": "Jack"
+        },
+        {
+          "pick": 21,
+          "team": "Tennessee",
+          "owner": "Nicholas"
+        },
+        {
+          "pick": 22,
+          "team": "Denver",
+          "owner": "Mykolas"
+        },
+        {
+          "pick": 23,
+          "team": "Detroit",
+          "owner": "Matt"
+        },
+        {
+          "pick": 24,
+          "team": "Indianapolis",
+          "owner": "Mike W"
+        },
+        {
+          "pick": 25,
+          "team": "Buffalo",
+          "owner": "Mike W"
+        },
+        {
+          "pick": 26,
+          "team": "San Francisco",
+          "owner": "Matt"
+        },
+        {
+          "pick": 27,
+          "team": "N.Y. Jets",
+          "owner": "Mykolas"
+        },
+        {
+          "pick": 28,
+          "team": "N.Y. Giants",
+          "owner": "Nicholas"
+        },
+        {
+          "pick": 29,
+          "team": "Washington",
+          "owner": "Jack"
+        },
+        {
+          "pick": 30,
+          "team": "Cincinnati",
+          "owner": "Luis"
+        },
+        {
+          "pick": 31,
+          "team": "Arizona",
+          "owner": "Evans"
+        },
+        {
+          "pick": 32,
+          "team": "Miami",
+          "owner": "Mark"
+        }
+      ]
+    }
+  ]
+}
