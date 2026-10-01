@@ -5,7 +5,8 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 ## Requested
 
 - **ATS (against the spread) stats.** Show how each team, and so each owner, performs against the spread.
-  - Needs a source for spreads and results. Check whether ESPN's odds data covers it before committing to this.
+  - Odds source (checked 2026-09-30): ESPN's unauthenticated APIs carry DraftKings odds. The scoreboard (`site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`) has spread, over/under and moneylines for upcoming games but not finished ones. The core API (`sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/{id}/competitions/{id}/odds`) returned open and close lines for a finished week 1 game, so historic spreads look available. Still to verify: coverage across all games, and how long ESPN keeps them.
+  - Spread-based "ATS" needs a final score plus the closing spread per game, both of which we can get from these endpoints.
 - **Weekly projections.** See how you and others are slated to perform in the coming week, and how that changes the standings.
   - Needs the upcoming schedule and some win-probability or spread source.
 - **Style changes.** The current look is deliberately basic. To be discussed in more depth before any work.
