@@ -115,15 +115,18 @@ function strip(c) {
 
 function standingsTable(c, co) {
   const tally = co.nums.length > 0;
-  const maxW = Math.max(1, ...c.rows.map(r => r.w));
-  const body = c.rows.map(r => `<tr class="${r.zone ? "z-" + r.zone : ""}">
+  const maxW = Math.max(1, ...c.rows.map(r => r.w)), minW = Math.min(...c.rows.map(r => r.w));
+  // Position by wins: 1 = most, 0 = fewest; ties share a color. Split into up/down halves for the CSS gradient.
+  const heat = r => { const t = maxW === minW ? .5 : (r.w - minW) / (maxW - minW);
+    return `--up:${Math.max(0, (t - .5) * 200).toFixed(0)}%;--dn:${Math.max(0, (.5 - t) * 200).toFixed(0)}%`; };
+  const body = c.rows.map(r => `<tr class="${r.zone ? "z-" + r.zone : ""}" style="${heat(r)}">
     <td class="rank">${r.rank}</td><td class="l owner">${r.name}</td>
     <td class="w" style="--p:${Math.round(r.w / maxW * 100)}%">${r.w}</td>
     <td>${r.l}</td><td>${r.t}</td><td class="dim">${r.g}</td>
     <td>${pct(r.pct)}</td><td class="dim">${pct(r.hist)}</td>
     ${tally ? `<td>${co.byOwner[r.name].fire}</td><td>${co.byOwner[r.name].poop}</td>` : ""}
     <td class="${r.net > 0 ? "pos" : "dim"}">${money(r.net)}</td></tr>`).join("");
-  return `<table><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
+  return `<table class="st"><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
     <th>Win%</th><th>Hist%</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 

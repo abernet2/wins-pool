@@ -2,6 +2,7 @@
 :root {
   --bg: #0a0c0a; --fg: #d7e5d2; --muted: #6f8268; --line: #1e281d; --panel: #0f130f;
   --accent: #39ff88; --promo: #39ff88; --rel: #ff4d4d; --bar: #39ff88;
+  --heat-hi: #0f6a35; --heat-mid: #5a5412; --heat-lo: #7a1f1f;
   --font-ui: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
   --font-head: var(--font-ui); --font-num: var(--font-ui);
   --head-case: uppercase; --head-weight: 700; --head-track: .08em;
@@ -11,6 +12,7 @@
 [data-theme="broadcast"] {
   --bg: #0d1320; --fg: #eef2f8; --muted: #7d8aa3; --line: #1f2a40; --panel: #121a2b;
   --accent: #ff5a1f; --promo: #2ee6a6; --rel: #ff5a1f; --bar: #ff5a1f;
+  --heat-hi: #0d7a5a; --heat-mid: #6b5a12; --heat-lo: #8a2a1c;
   --font-ui: system-ui, "Segoe UI", Roboto, sans-serif;
   --font-head: Oswald, "Bebas Neue", Impact, "Arial Narrow", system-ui, sans-serif;
   --font-num: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
@@ -19,6 +21,7 @@
 [data-theme="brutalist"] {
   --bg: #f3efe6; --fg: #000; --muted: #5c5a53; --line: #000; --panel: #fff;
   --accent: #ff2a00; --promo: #006b2e; --rel: #ff2a00; --bar: #000;
+  --heat-hi: #7fe08f; --heat-mid: #ffe680; --heat-lo: #ff8f80;
   --font-ui: "Helvetica Neue", Arial, system-ui, sans-serif; --font-head: var(--font-ui);
   --font-num: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
   --head-weight: 900; --head-track: .02em; --rule: 1px; --rule-strong: 3px;
@@ -65,6 +68,10 @@ th.l, td.l { text-align: left; font-family: var(--font-ui); }
 .dim { color: var(--muted); }
 .pos { color: var(--promo); font-weight: 700; }
 td.w { font-weight: 700; background: linear-gradient(var(--bar), var(--bar)) left bottom / var(--p) 3px no-repeat; }
+/* Row color: green (most wins) -> yellow (middle) -> red (fewest). --up/--dn are set per row in JS. */
+.st tbody tr { background: color-mix(in oklab,
+  color-mix(in oklab, var(--heat-mid) calc(100% - var(--up, 0%)), var(--heat-hi) var(--up, 0%))
+  calc(100% - var(--dn, 0%)), var(--heat-lo) var(--dn, 0%)); }
 tr.z-rel > td:first-child { box-shadow: inset 3px 0 0 var(--rel); }
 tr.z-promo > td:first-child { box-shadow: inset 3px 0 0 var(--promo); }
 td.live, th.live { color: var(--muted); font-style: italic; }
@@ -81,3 +88,6 @@ details[open] > summary { border-bottom: var(--rule) solid var(--line); }
 .legend { margin-top: 18px; color: var(--muted); font-size: 11px; }
 .legend i { font-style: normal; font-weight: 700; }
 .err { padding: 12px; color: var(--rel); border: var(--rule) solid var(--rel); }
+
+/* Keep secondary text legible on the colored standings rows. */
+.st .dim, .st .rank { color: color-mix(in srgb, var(--fg) 62%, transparent); }
