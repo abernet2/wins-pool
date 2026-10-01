@@ -213,3 +213,5 @@ h2 .short, h2 .more { display: none; }
   .leagues h2 { margin-bottom: 5px; }
   .strip { padding: 5px 8px; margin-bottom: 5px; }
 }
+
+#build { color: var(--accent); }

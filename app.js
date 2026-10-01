@@ -430,12 +430,23 @@ document.addEventListener("click", e => {
 });
 window.addEventListener("hashchange", render);
 
+// Shows when the site files were last changed (the server's Last-Modified for app.js), so you can tell at a
+// glance that the browser is running the latest version.
+function stampBuild() {
+  fetch("app.js", { method: "HEAD", cache: "no-store" }).then(r => {
+    const lm = r.headers.get("last-modified");
+    if (!lm || !$("build")) return;
+    $("build").textContent = " · build " + new Date(lm).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }).catch(() => {});
+}
+
 initThemes();
 loadSeason().then(ctx => {
   CTX = ctx;
   const upd = ctx.wins.updated ? ` · updated ${new Date(ctx.wins.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
-  $("sub").textContent = `${ctx.season} · regular season${upd}`;
+  $("sub").innerHTML = `${esc(ctx.season)} · regular season${esc(upd)}<span id="build"></span>`;
   render();
+  stampBuild();
 }).catch(e => {
   $("sub").textContent = "";
   $("app").innerHTML = `<div class="err">Could not load data (${esc(e.message)}). Serve this folder over http, e.g. <code>python3 -m http.server</code>.</div>`;
