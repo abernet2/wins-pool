@@ -179,3 +179,37 @@ tr.champ td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
   tr.champ td:first-child { box-shadow: none; }
   table.hist tr.champ { box-shadow: inset 3px 0 0 var(--accent); padding-left: 11px; }
 }
+
+/* ---- phones: make the main view fit on one screen ---- */
+h2 .short, h2 .more { display: none; }
+@media (max-width: 600px) {
+  body { padding: 8px 10px 14px; }
+  header { margin-bottom: 6px; padding-bottom: 5px; gap: 2px 10px; align-items: center; }
+  h1 { font-size: 15px; }
+  .sub { flex-basis: 100%; order: 3; font-size: 10px; }
+  .themes { margin-left: auto; }
+  .themes button { padding: 3px 7px; font-size: 9px; }
+
+  .leagues { gap: 10px; }
+  .leagues h2 { flex-wrap: nowrap; margin-bottom: 3px; font-size: 13px; }
+  .leagues h2 small { flex-basis: auto; margin-left: auto; font-size: 10px; }
+  .leagues h2 .full { display: none; }
+  .leagues h2 .short { display: inline; }
+  .leagues h2 .more { display: inline; font: 400 10px var(--font-ui); color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 8px; }
+  .leagues details { display: none; }       /* draft order and weekly grid live on the league page */
+  .strip { margin-bottom: 3px; padding: 3px 8px; font-size: 11px; }
+
+  :root { --pad-y: 3px; --pad-x: 6px; --fs: 12px; }
+  .leagues th { padding-top: 3px; padding-bottom: 3px; }
+
+  .legend { margin-top: 8px; font-size: 10px; }
+  .legend span:nth-child(5) { display: none; }
+}
+
+/* taller phones have room to spare: looser rows and bigger tap targets */
+@media (max-width: 600px) and (min-height: 760px) {
+  :root { --pad-y: 6px; }
+  .leagues { gap: 16px; }
+  .leagues h2 { margin-bottom: 5px; }
+  .strip { padding: 5px 8px; margin-bottom: 5px; }
+}

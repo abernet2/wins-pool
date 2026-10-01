@@ -194,7 +194,8 @@ function dashboard(ctx) {
   const me = getMe();
   return `<div class="leagues">` + ctx.league.leagues.map(lg => {
     const { c, co } = ctx.byLeague[lg.id];
-    return `<section><h2><a href="#/league/${lg.id}">${esc(lg.name)}</a><small>$${lg.buyIn} × ${lg.owners.length} = $${c.pot} · winner takes all</small></h2>
+    return `<section><h2><a href="#/league/${lg.id}">${esc(lg.name)}</a><a class="more" href="#/league/${lg.id}">draft · weekly ›</a>
+      <small><span class="full">$${lg.buyIn} × ${lg.owners.length} = $${c.pot} · winner takes all</span><span class="short">$${c.pot} pot</span></small></h2>
       ${strip(co)}
       <div class="tbl">${standingsTable(c, co, me)}</div>
       <details><summary>Draft order</summary><div class="scroll">${draftTable(lg, ctx.teams, me)}</div></details>
