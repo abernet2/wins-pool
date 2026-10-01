@@ -22,8 +22,6 @@
   section { margin-bottom: 36px; }
   h2 { font-size: 18px; margin: 0 0 10px; }
   .pot { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
-  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
   table { border-collapse: collapse; width: 100%; white-space: nowrap; }
   th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); }
@@ -39,8 +37,11 @@
   .money.pos { color: var(--promo); font-weight: 600; }
   .muted { color: var(--muted); }
   .err { padding: 16px; color: var(--rel); }
-  .callouts { margin-top: 16px; }
-  .headline { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .headline { padding: 10px 14px; margin-bottom: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  details { margin-top: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  summary { cursor: pointer; padding: 10px 14px; font-weight: 600; user-select: none; }
+  details[open] > summary { border-bottom: 1px solid var(--line); }
+  details .scroll { overflow-x: auto; }
   .headline b { margin-right: 4px; }
   .hl-row { display: flex; flex-wrap: wrap; gap: 4px 20px; }
   .wk { text-align: center; min-width: 3.2em; }
@@ -106,15 +107,17 @@ function draftTable(lg, teams) {
     <tbody>${body}</tbody></table>`;
 }
 
-function standingsTable(lg, c) {
+function standingsTable(lg, c, co) {
+  const tally = co && co.nums.length;
   const body = c.rows.map(r => `<tr style="background:${heat(r, c.rows)}">
     <td class="num rank">${r.rank}</td>
     <td class="l owner">${r.name}${r.zone === "promo" ? '<span class="tag promo">Promotion</span>' : ""}${r.zone === "rel" ? '<span class="tag rel">Relegation</span>' : ""}</td>
     <td class="num">${r.w}</td><td class="num">${r.l}</td><td class="num">${r.t}</td><td class="num">${r.g}</td>
     <td class="num">${pct(r.pct)}</td><td class="num muted">${pct(r.hist)}</td>
+    ${tally ? `<td class="num">${co.byOwner[r.name].fire}</td><td class="num">${co.byOwner[r.name].poop}</td>` : ""}
     <td class="num money ${r.net > 0 ? "pos" : ""}">${money(r.net)}</td></tr>`).join("");
   return `<table><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
-    <th>Win %</th><th>Hist %</th><th>Net $</th></tr></thead><tbody>${body}</tbody></table>`;
+    <th>Win %</th><th>Hist %</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net $</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
 // Weekly callouts: per league, the owner(s) with the most wins in a finished week get 🔥,
@@ -146,13 +149,16 @@ function computeCallouts(lg, weeks) {
   return out;
 }
 
-function callout(lg, c, rows) {
-  if (!c.nums.length) return "";
+function headline(c) {
   const done = c.nums.filter(n => c.weeks[n].complete);
   const last = done[done.length - 1];
-  const head = last ? `<div class="headline"><b>Week ${last}</b>
+  if (!last) return "";
+  return `<div class="headline"><b>Week ${last}</b>
     <div class="hl-row"><span>🔥 ${c.weeks[last].fire.join(", ") || "—"}</span>
-    <span>💩 ${c.weeks[last].poop.join(", ") || "—"}</span></div></div>` : "";
+    <span>💩 ${c.weeks[last].poop.join(", ") || "—"}</span></div></div>`;
+}
+
+function weeklyGrid(c, rows) {
   const th = c.nums.map(n => `<th class="wk">${n}</th>`).join("");
   const body = rows.map(r => {
     const o = c.byOwner[r.name];
@@ -161,10 +167,9 @@ function callout(lg, c, rows) {
       const mark = i.fire.includes(r.name) ? " 🔥" : i.poop.includes(r.name) ? " 💩" : "";
       return `<td class="num wk${i.complete ? "" : " live"}">${o.wins[n]}${mark}</td>`;
     }).join("");
-    return `<tr><td class="l owner">${r.name}</td>${cells}<td class="num wk">${o.fire}</td><td class="num wk">${o.poop}</td></tr>`;
+    return `<tr><td class="l owner">${r.name}</td>${cells}</tr>`;
   }).join("");
-  return `<div class="card callouts">${head}<table><thead><tr><th class="l">Weekly wins</th>${th}
-    <th class="wk">🔥</th><th class="wk">💩</th></tr></thead><tbody>${body}</tbody></table></div>`;
+  return `<table><thead><tr><th class="l">Wins by week</th>${th}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
 load().then(({ league, wins, weeks }) => {
@@ -172,10 +177,14 @@ load().then(({ league, wins, weeks }) => {
   document.getElementById("sub").textContent = `${league.season} season · regular season only${upd}`;
   document.getElementById("root").innerHTML = league.leagues.map(lg => {
     const c = computeLeague(lg, wins.teams);
+    const co = computeCallouts(lg, weeks);
+    const has = co.nums.length;
     return `<section><h2>${lg.name}<span class="pot">$${lg.buyIn} buy-in · $${c.pot} pot · winner takes all</span></h2>
-      <div class="grid"><div class="card">${draftTable(lg, wins.teams)}</div>
-      <div class="card">${standingsTable(lg, c)}</div></div>
-      ${callout(lg, computeCallouts(lg, weeks), c.rows)}</section>`;
+      ${has ? headline(co) : ""}
+      <div class="card">${standingsTable(lg, c, co)}</div>
+      <details><summary>Draft order</summary><div class="scroll">${draftTable(lg, wins.teams)}</div></details>
+      ${has ? `<details><summary>Weekly wins</summary><div class="scroll">${weeklyGrid(co, c.rows)}</div></details>` : ""}
+    </section>`;
   }).join("");
 }).catch(e => {
   document.getElementById("sub").textContent = "";
