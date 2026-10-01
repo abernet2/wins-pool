@@ -332,20 +332,66 @@ function playerPage(ctx, name) {
     </section>`;
 }
 
+// Every season a team has been in the pool: final record, and who drafted it in each league.
+function teamHistory(ctx, name) {
+  return Object.keys(ctx.all).sort().reverse().map(season => {
+    const S = ctx.all[season], rec = S.teams[name];
+    if (!rec) return null;
+    const drafted = {};
+    S.league.leagues.forEach(lg => {
+      const p = lg.picks.find(x => x.team === name);
+      if (p) drafted[lg.id] = { owner: p.owner, pick: p.pick };
+    });
+    const g = rec.w + rec.l + rec.t;
+    return { season, live: season === ctx.season, ...rec, pct: g ? rec.w / g : 0, drafted };
+  }).filter(Boolean);
+}
+
 function teamPage(ctx, name) {
   if (!ctx.teams[name]) return notFound("team");
-  const r = ctx.teams[name];
-  const drafted = ctx.league.leagues.map(lg => {
-    const p = lg.picks.find(x => x.team === name);
-    return p ? `<tr><td class="l">${esc(lg.name)}</td><td class="dim">${p.pick}</td><td class="l owner">${ownerLink(p.owner)}</td></tr>` : "";
-  }).join("");
-  const wk = Object.keys(ctx.weeks).map(Number).sort((a, b) => a - b).map(n => `<tr>
-    <td class="dim">Wk ${n}</td><td class="l">${chip(ctx.weeks[n].results[name], ctx.weeks[n].complete)}</td></tr>`).join("");
+  const me = getMe();
+  const hist = teamHistory(ctx, name);
+  const done = hist.filter(h => !h.live);   // best and worst only count finished seasons
+  const sum = k => hist.reduce((n, h) => n + h[k], 0);
+  const w = sum("w"), l = sum("l"), t = sum("t");
+  const best = done.length ? done.reduce((a, b) => b.pct > a.pct || (b.pct === a.pct && b.w > a.w) ? b : a) : null;
+  const worst = done.length ? done.reduce((a, b) => b.pct < a.pct || (b.pct === a.pct && b.w < a.w) ? b : a) : null;
+  const stat = (label, val) => `<div class="stat"><span>${label}</span><b>${val}</b></div>`;
+  const stats = [
+    stat("Seasons", hist.length), stat("Record", `${w}-${l}${t ? "-" + t : ""}`), stat("Win %", pct(w / (w + l + t || 1))),
+    best ? stat("Best", `${best.w}-${best.l}${best.t ? "-" + best.t : ""} <small>${shortYear(best.season)}</small>`) : "",
+    worst ? stat("Worst", `${worst.w}-${worst.l}${worst.t ? "-" + worst.t : ""} <small>${shortYear(worst.season)}</small>`) : "",
+  ].join("");
+
+  const cell = d => d ? `<span class="${d.owner === me ? "isme" : ""}">${ownerLink(d.owner)}</span> <span class="dim">#${d.pick}</span>` : `<span class="dim">–</span>`;
+  const maxLg = Math.max(...ctx.league.leagues.map(l => l.id), ...Object.values(ctx.all).flatMap(S => S.league.leagues.map(l => l.id)));
+  const lgIds = Array.from({ length: maxLg }, (_, i) => i + 1);
+  const rows = hist.map(h => `<tr><td class="l">${esc(h.season)}${h.live ? ` <span class="dim">(live)</span>` : ""}</td>
+    <td>${h.w}-${h.l}${h.t ? "-" + h.t : ""}</td><td>${pct(h.pct)}</td>
+    ${lgIds.map(id => `<td class="l">${cell(h.drafted[id])}</td>`).join("")}</tr>`).join("");
+
+  // Owners who have drafted this team, most often first.
+  const by = {};
+  hist.forEach(h => Object.values(h.drafted).forEach(d => {
+    const e = by[d.owner] ||= { owner: d.owner, n: 0, pickSum: 0, w: 0, l: 0, t: 0, seasons: [] };
+    e.n++; e.pickSum += d.pick; e.w += h.w; e.l += h.l; e.t += h.t; e.seasons.push(h.season);
+  }));
+  const owners = Object.values(by).sort((a, b) => b.n - a.n || a.pickSum / a.n - b.pickSum / b.n || a.owner.localeCompare(b.owner));
+  const ownerRows = owners.map(e => `<tr><td class="l owner">${ownerLink(e.owner)}</td><td><b>${e.n}</b></td>
+    <td>${(e.pickSum / e.n).toFixed(1)}</td><td>${recStr(e)}</td>
+    <td class="l dim wrap">${e.seasons.slice().sort().map(shortYear).join(" ")}</td></tr>`).join("");
+
+  const wkChips = Object.keys(ctx.weeks).length
+    ? `<h3>${esc(ctx.season)} by week</h3><div class="chips big">${chipsFor(ctx, name)}</div>` : "";
   return `<div class="crumbs"><a href="#/">Season ${esc(ctx.season)}</a> / ${esc(name)}</div>
-    <section class="narrow"><h2>${esc(name)}<small>${ctx.season} · ${r.w}-${r.l}${r.t ? "-" + r.t : ""}</small></h2>
-      <div class="chips big">${chipsFor(ctx, name)}</div>
+    <section class="narrow"><h2>${esc(name)}</h2>
+      <div class="stats">${stats}</div>${wkChips}
+      <h3>By season</h3>
+      <div class="tbl"><table><thead><tr><th class="l">Season</th><th>Record</th><th>Win%</th>
+        ${lgIds.map(id => `<th class="l">League ${id} owner</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
       <h3>Drafted by</h3>
-      <div class="tbl"><table><thead><tr><th class="l">League</th><th>Pick</th><th class="l">Owner</th></tr></thead><tbody>${drafted}</tbody></table></div>
+      <div class="tbl"><div class="scroll"><table><thead><tr><th class="l">Owner</th><th>Times</th><th>Avg pick</th><th>Their record</th><th class="l">Seasons</th></tr></thead>
+        <tbody>${ownerRows}</tbody></table></div></div>
     </section>`;
 }
 
