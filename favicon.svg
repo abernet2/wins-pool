@@ -1,20 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <path id="shield" d="M8 10C20 5.5 44 5.5 56 10V34C56 48 45 57 32 62C19 57 8 48 8 34Z"/>
+    <path id="shield" d="M9 9.5C21 4.5 43 4.5 55 9.5V35C55 48.5 44.5 57 32 62C19.5 57 9 48.5 9 35Z"/>
     <clipPath id="clip"><use href="#shield"/></clipPath>
   </defs>
+  <g transform="translate(32 33) scale(.9) translate(-32 -33)">
+  <use href="#shield" fill="none" stroke="#0b2a5b" stroke-width="6" stroke-linejoin="round"/>
+  <use href="#shield" fill="#0b2a5b" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
   <g clip-path="url(#clip)">
-    <rect width="64" height="64" fill="#0b2a5b"/>
-    <rect width="64" height="19" fill="#c8102e"/>
-    <rect y="19" width="64" height="1.4" fill="#fff"/>
+    <path d="M6 25.5Q32 16.5 58 25.5" fill="none" stroke="#d50a0a" stroke-width="2.2"/>
   </g>
-  <use href="#shield" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
-  <use href="#shield" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"
-       transform="translate(32 35) scale(.88) translate(-32 -35)"/>
-  <path d="M21.50 10.40L22.14 12.12L23.97 12.20L22.54 13.34L23.03 15.10L21.50 14.09L19.97 15.10L20.46 13.34L19.03 12.20L20.86 12.12Z M32.00 8.90L32.81 11.08L35.14 11.18L33.32 12.63L33.94 14.87L32.00 13.59L30.06 14.87L30.68 12.63L28.86 11.18L31.19 11.08Z M42.50 10.40L43.14 12.12L44.97 12.20L43.54 13.34L44.03 15.10L42.50 14.09L40.97 15.10L41.46 13.34L40.03 12.20L41.86 12.12Z" fill="#fff"/>
-  <g fill="none" stroke="#fff" stroke-width="2.9" stroke-linejoin="miter">
-    <path d="M14 27L17.3 44L20.3 34L23.3 44L26.6 27"/>
-    <path d="M30.8 44V27H35.2A4 4 0 0 1 35.2 35H30.8"/>
-    <path d="M44.2 27V44H51.8"/>
+  <path d="M15.50 14.85L16.08 16.40L17.73 16.47L16.44 17.50L16.88 19.10L15.50 18.19L14.12 19.10L14.56 17.50L13.27 16.47L14.92 16.40Z M21.00 12.25L21.58 13.80L23.23 13.87L21.94 14.90L22.38 16.50L21.00 15.59L19.62 16.50L20.06 14.90L18.77 13.87L20.42 13.80Z M26.50 10.35L27.08 11.90L28.73 11.97L27.44 13.00L27.88 14.60L26.50 13.68L25.12 14.60L25.56 13.00L24.27 11.97L25.92 11.90Z M32.00 9.65L32.58 11.20L34.23 11.27L32.94 12.30L33.38 13.90L32.00 12.99L30.62 13.90L31.06 12.30L29.77 11.27L31.42 11.20Z M37.50 10.35L38.08 11.90L39.73 11.97L38.44 13.00L38.88 14.60L37.50 13.68L36.12 14.60L36.56 13.00L35.27 11.97L36.92 11.90Z M43.00 12.25L43.58 13.80L45.23 13.87L43.94 14.90L44.38 16.50L43.00 15.59L41.62 16.50L42.06 14.90L40.77 13.87L42.42 13.80Z M48.50 14.85L49.08 16.40L50.73 16.47L49.44 17.50L49.88 19.10L48.50 18.19L47.12 19.10L47.56 17.50L46.27 16.47L47.92 16.40Z" fill="#fff"/>
+  <g fill="none" stroke="#fff" stroke-width="3.2" stroke-linejoin="miter" stroke-miterlimit="2">
+    <path d="M13.5 28.5L17.2 45L20.5 35.5L23.8 45L27.5 28.5"/>
+    <path d="M31.5 45V28.5H35.8A4.1 4.1 0 0 1 35.8 36.7H31.5"/>
+    <path d="M43.5 28.5V45H51"/>
+  </g>
   </g>
 </svg>
