@@ -6,6 +6,17 @@ const ownerLink = n => `<a href="#/player/${encodeURIComponent(n)}">${esc(n)}</a
 const teamLink = n => `<a href="#/team/${encodeURIComponent(n)}">${esc(n)}</a>`;
 const $ = id => document.getElementById(id);
 
+// Short team codes for tight lists (full name on hover). Washington is WAS, as on NFL.com.
+const ABBR = {
+  "Arizona": "ARI", "Atlanta": "ATL", "Baltimore": "BAL", "Buffalo": "BUF", "Carolina": "CAR", "Chicago": "CHI",
+  "Cincinnati": "CIN", "Cleveland": "CLE", "Dallas": "DAL", "Denver": "DEN", "Detroit": "DET", "Green Bay": "GB",
+  "Houston": "HOU", "Indianapolis": "IND", "Jacksonville": "JAX", "Kansas City": "KC", "L.A. Chargers": "LAC",
+  "L.A. Rams": "LAR", "Las Vegas": "LV", "Miami": "MIA", "Minnesota": "MIN", "N.Y. Giants": "NYG", "N.Y. Jets": "NYJ",
+  "New England": "NE", "New Orleans": "NO", "Philadelphia": "PHI", "Pittsburgh": "PIT", "San Francisco": "SF",
+  "Seattle": "SEA", "Tampa Bay": "TB", "Tennessee": "TEN", "Washington": "WAS",
+};
+const teamAbbr = n => `<a href="#/team/${encodeURIComponent(n)}" title="${esc(n)}">${ABBR[n] || esc(n)}</a>`;
+
 // ---- "I'm me" (saved in this browser only) ----
 const getMe = () => { try { return localStorage.getItem("me"); } catch (e) { return null; } };
 const setMe = n => { try { n ? localStorage.setItem("me", n) : localStorage.removeItem("me"); } catch (e) {} };
@@ -232,7 +243,7 @@ const shortYear = s => "'" + s.slice(2, 4);
 function historyTable(hist) {
   const body = hist.map(h => {
     const mv = h.move === "promoted" ? `<span class="mv up" title="Promoted">▲</span>` : h.move === "relegated" ? `<span class="mv dn" title="Relegated">▼</span>` : "";
-    const teams = h.teams.map(t => `${teamLink(t.team)} <span class="dim">${recStr(t.rec)}</span>`).join(" · ");
+    const teams = h.teams.map(t => `${teamAbbr(t.team)} <span class="dim">${recStr(t.rec)}</span>`).join(" · ");
     return `<tr class="${h.rank === 1 ? "champ" : ""}"><td class="l">${esc(h.season)}${h.live ? ` <span class="dim">(live)</span>` : ""}</td>
       <td>${h.lg}</td><td>${h.rank === 1 ? "🏆 " : ""}#${h.rank}<span class="dim">/${h.of}</span> ${mv}</td>
       <td>${recStr(h)}</td><td>${pct(h.pct)}</td><td class="l wrap">${teams}</td></tr>`;
@@ -252,7 +263,7 @@ function draftFrequency(hist) {
 }
 
 function frequencyTable(freq) {
-  const body = freq.map(e => `<tr><td class="l">${teamLink(e.team)}</td><td class="num"><b>${e.n}</b></td>
+  const body = freq.map(e => `<tr><td class="l">${teamAbbr(e.team)}</td><td class="num"><b>${e.n}</b></td>
     <td>${(e.pickSum / e.n).toFixed(1)}</td><td>${recStr(e)}</td>
     <td class="l dim wrap">${e.seasons.slice().sort().map(shortYear).join(" ")}</td></tr>`).join("");
   return `<table><thead><tr><th class="l">Team</th><th>Times</th><th>Avg pick</th><th>Their record</th><th class="l">Seasons</th></tr></thead>
@@ -298,7 +309,7 @@ function playerPage(ctx, name) {
     const th = wkNums.map(n => `<th class="wk">${n}</th>`).join("");
     const teamRows = lg.picks.filter(p => p.owner === name).map(p => {
       const r = ctx.teams[p.team] || { w: 0, l: 0, t: 0 };
-      return `<tr><td class="dim">${p.pick}</td><td class="l">${teamLink(p.team)}</td>
+      return `<tr><td class="dim">${p.pick}</td><td class="l">${teamAbbr(p.team)}</td>
         <td>${recStr(r)}</td><td class="l chips">${chipsFor(ctx, p.team)}</td></tr>`;
     }).join("");
     current = `<h3>${esc(ctx.season)} · ${esc(lg.name)}</h3><div class="stats">${stats}</div>
