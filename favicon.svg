@@ -1,15 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <clipPath id="s"><path id="shield" d="M7 5H57V34C57 48 45 57 32 62C19 57 7 48 7 34Z"/></clipPath>
+    <path id="shield" d="M8 10C20 5.5 44 5.5 56 10V34C56 48 45 57 32 62C19 57 8 48 8 34Z"/>
+    <clipPath id="clip"><use href="#shield"/></clipPath>
   </defs>
-  <g clip-path="url(#s)">
+  <g clip-path="url(#clip)">
     <rect width="64" height="64" fill="#0b2a5b"/>
-    <rect y="5" width="64" height="12" fill="#d50a0a"/>
+    <rect width="64" height="19" fill="#c8102e"/>
+    <rect y="19" width="64" height="1.4" fill="#fff"/>
   </g>
-  <use href="#shield" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/>
-  <g fill="none" stroke="#fff" stroke-width="3.1" stroke-linejoin="miter">
-    <path d="M12.5 25L16 43L19.2 32L22.4 43L26 25"/>
-    <path d="M30.5 43V25H35A4.2 4.2 0 0 1 35 33.4H30.5"/>
-    <path d="M44.5 25V43H52.5"/>
+  <use href="#shield" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
+  <use href="#shield" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"
+       transform="translate(32 35) scale(.88) translate(-32 -35)"/>
+  <path d="M21.50 10.40L22.14 12.12L23.97 12.20L22.54 13.34L23.03 15.10L21.50 14.09L19.97 15.10L20.46 13.34L19.03 12.20L20.86 12.12Z M32.00 8.90L32.81 11.08L35.14 11.18L33.32 12.63L33.94 14.87L32.00 13.59L30.06 14.87L30.68 12.63L28.86 11.18L31.19 11.08Z M42.50 10.40L43.14 12.12L44.97 12.20L43.54 13.34L44.03 15.10L42.50 14.09L40.97 15.10L41.46 13.34L40.03 12.20L41.86 12.12Z" fill="#fff"/>
+  <g fill="none" stroke="#fff" stroke-width="2.9" stroke-linejoin="miter">
+    <path d="M14 27L17.3 44L20.3 34L23.3 44L26.6 27"/>
+    <path d="M30.8 44V27H35.2A4 4 0 0 1 35.2 35H30.8"/>
+    <path d="M44.2 27V44H51.8"/>
   </g>
 </svg>
