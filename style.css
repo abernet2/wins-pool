@@ -69,11 +69,13 @@ th.l, td.l { text-align: left; font-family: var(--font-ui); }
 .pos { color: var(--promo); font-weight: 700; }
 /* Wins slider: length = wins, color = position in the league (green most wins -> yellow -> red fewest).
    --up/--dn (0-100%) are set per row in JS; each theme sets --heat-hi/mid/lo. */
-td.w { font-weight: 700;
+td.w, td.rec {
   --c: color-mix(in oklab,
     color-mix(in oklab, var(--heat-mid) calc(100% - var(--up, 0%)), var(--heat-hi) var(--up, 0%))
-    calc(100% - var(--dn, 0%)), var(--heat-lo) var(--dn, 0%));
-  background: linear-gradient(var(--c), var(--c)) left bottom / var(--p) 4px no-repeat; }
+    calc(100% - var(--dn, 0%)), var(--heat-lo) var(--dn, 0%)); }
+td.w { font-weight: 700; background: linear-gradient(var(--c), var(--c)) left bottom / var(--p) 4px no-repeat; }
+/* Draft order record cell: a tinted block, softened so the text stays readable. */
+td.rec { font-weight: 600; background: color-mix(in srgb, var(--c) 48%, transparent); }
 tr.z-rel > td:first-child { box-shadow: inset 3px 0 0 var(--rel); }
 tr.z-promo > td:first-child { box-shadow: inset 3px 0 0 var(--promo); }
 td.live, th.live { color: var(--muted); font-style: italic; }

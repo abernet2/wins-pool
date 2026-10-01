@@ -142,12 +142,14 @@ function strip(c) {
     <span>💩 ${c.weeks[last].poop.map(ownerLink).join(", ") || "—"}</span></div>`;
 }
 
+// Position t (1 = best, 0 = worst) as the --up/--dn pair the CSS gradient uses: green -> yellow -> red.
+const heatVars = t => `--up:${Math.max(0, (t - .5) * 200).toFixed(0)}%;--dn:${Math.max(0, (.5 - t) * 200).toFixed(0)}%`;
+
 function standingsTable(c, co, me) {
   const tally = co.nums.length > 0;
   const maxW = Math.max(1, ...c.rows.map(r => r.w)), minW = Math.min(...c.rows.map(r => r.w));
   // Position by wins: 1 = most, 0 = fewest; ties share a color. Split into up/down halves for the CSS gradient.
-  const heat = r => { const t = maxW === minW ? .5 : (r.w - minW) / (maxW - minW);
-    return `--up:${Math.max(0, (t - .5) * 200).toFixed(0)}%;--dn:${Math.max(0, (.5 - t) * 200).toFixed(0)}%`; };
+  const heat = r => heatVars(maxW === minW ? .5 : (r.w - minW) / (maxW - minW));
   const body = c.rows.map(r => `<tr class="${r.zone ? "z-" + r.zone : ""}${r.name === me ? " me" : ""}" style="${heat(r)}">
     <td class="rank">${r.rank}</td><td class="l owner">${ownerLink(r.name)}</td>
     <td class="w" style="--p:${Math.round(r.w / maxW * 100)}%">${r.w}</td>
@@ -160,10 +162,14 @@ function standingsTable(c, co, me) {
 }
 
 function draftTable(lg, teams, me) {
+  // Record cell is shaded by the team's wins relative to the other 31 teams: a quick read on pick quality.
+  const wins = lg.picks.map(p => (teams[p.team] || { w: 0 }).w);
+  const max = Math.max(...wins), min = Math.min(...wins);
   const body = lg.picks.map(p => {
     const r = teams[p.team] || { w: 0, l: 0, t: 0 };
+    const t = max === min ? .5 : (r.w - min) / (max - min);
     return `<tr class="${p.owner === me ? "me" : ""}"><td class="dim">${p.pick}</td><td class="l">${teamLink(p.team)}</td>
-      <td class="l owner">${ownerLink(p.owner)}</td><td>${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td></tr>`;
+      <td class="l owner">${ownerLink(p.owner)}</td><td class="rec" style="${heatVars(t)}">${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td></tr>`;
   }).join("");
   return `<table><thead><tr><th>Pick</th><th class="l">Team</th><th class="l">Owner</th><th>Rec</th></tr></thead>
     <tbody>${body}</tbody></table>`;
