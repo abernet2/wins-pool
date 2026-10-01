@@ -153,12 +153,12 @@ function standingsTable(c, co, me) {
   const body = c.rows.map(r => `<tr class="${r.zone ? "z-" + r.zone : ""}${r.name === me ? " me" : ""}" style="${heat(r)}">
     <td class="rank">${r.rank}</td><td class="l owner">${ownerLink(r.name)}</td>
     <td class="w" style="--p:${Math.round(r.w / maxW * 100)}%">${r.w}</td>
-    <td>${r.l}</td><td>${r.t}</td><td class="dim">${r.g}</td>
-    <td>${pct(r.pct)}</td><td class="dim">${pct(r.hist)}</td>
+    <td>${r.l}</td><td class="c-t">${r.t}</td><td class="dim c-gp">${r.g}</td>
+    <td>${pct(r.pct)}</td><td class="dim c-hist">${pct(r.hist)}</td>
     ${tally ? `<td>${co.byOwner[r.name].fire}</td><td>${co.byOwner[r.name].poop}</td>` : ""}
     <td class="${r.net > 0 ? "pos" : "dim"}">${money(r.net)}</td></tr>`).join("");
-  return `<table class="st"><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
-    <th>Win%</th><th>Hist%</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net</th></tr></thead><tbody>${body}</tbody></table>`;
+  return `<table class="st"><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th class="c-t">T</th><th class="c-gp">GP</th>
+    <th>Win%</th><th class="c-hist">Hist%</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
 function draftTable(lg, teams, me) {
@@ -201,7 +201,7 @@ function dashboard(ctx) {
       ${co.nums.length ? `<details><summary>Weekly wins</summary><div class="scroll">${weeklyGrid(co, c.rows)}</div></details>` : ""}
     </section>`;
   }).join("") + `</div>
-  <div class="legend"><i style="color:var(--promo)">▌</i> promotion zone &nbsp; <i style="color:var(--rel)">▌</i> relegation zone &nbsp; · &nbsp; 🔥 most wins in a week &nbsp; 💩 fewest &nbsp; · &nbsp; ties broken by historic win %</div>`;
+  <div class="legend"><span><i style="color:var(--promo)">▌</i> promotion zone</span><span><i style="color:var(--rel)">▌</i> relegation zone</span><span>🔥 most wins in a week</span><span>💩 fewest</span><span>ties broken by historic win %</span></div>`;
 }
 
 function leaguePage(ctx, id) {
@@ -251,10 +251,10 @@ function historyTable(hist) {
     const mv = h.move === "promoted" ? `<span class="mv up" title="Promoted">▲</span>` : h.move === "relegated" ? `<span class="mv dn" title="Relegated">▼</span>` : "";
     const teams = h.teams.map(t => `${teamAbbr(t.team)} <span class="dim">${recStr(t.rec)}</span>`).join(" · ");
     return `<tr class="${h.rank === 1 ? "champ" : ""}"><td class="l">${esc(h.season)}${h.live ? ` <span class="dim">(live)</span>` : ""}</td>
-      <td>${h.lg}</td><td>${h.rank === 1 ? "🏆 " : ""}#${h.rank}<span class="dim">/${h.of}</span> ${mv}</td>
-      <td>${recStr(h)}</td><td>${pct(h.pct)}</td><td class="l wrap">${teams}</td></tr>`;
+      <td class="lg">${h.lg}</td><td>${h.rank === 1 ? "🏆 " : ""}#${h.rank}<span class="dim">/${h.of}</span> ${mv}</td>
+      <td>${recStr(h)}</td><td>${pct(h.pct)}</td><td class="l wrap tm">${teams}</td></tr>`;
   }).join("");
-  return `<table><thead><tr><th class="l">Season</th><th>Lg</th><th>Finish</th><th>Record</th><th>Win%</th><th class="l">Teams</th></tr></thead>
+  return `<table class="hist"><thead><tr><th class="l">Season</th><th>Lg</th><th>Finish</th><th>Record</th><th>Win%</th><th class="l">Teams</th></tr></thead>
     <tbody>${body}</tbody></table>`;
 }
 
@@ -374,7 +374,7 @@ function teamPage(ctx, name) {
   const lgIds = Array.from({ length: maxLg }, (_, i) => i + 1);
   const rows = hist.map(h => `<tr><td class="l">${esc(h.season)}${h.live ? ` <span class="dim">(live)</span>` : ""}</td>
     <td>${h.w}-${h.l}${h.t ? "-" + h.t : ""}</td><td>${pct(h.pct)}</td>
-    ${lgIds.map(id => `<td class="l">${cell(h.drafted[id])}</td>`).join("")}</tr>`).join("");
+    ${lgIds.map(id => `<td class="l lgc${h.drafted[id] ? "" : " none"}" data-lg="${id}">${cell(h.drafted[id])}</td>`).join("")}</tr>`).join("");
 
   // Owners who have drafted this team, most often first.
   const by = {};
@@ -393,7 +393,7 @@ function teamPage(ctx, name) {
     <section class="narrow"><h2>${esc(name)}</h2>
       <div class="stats">${stats}</div>${wkChips}
       <h3>By season</h3>
-      <div class="tbl"><table><thead><tr><th class="l">Season</th><th>Record</th><th>Win%</th>
+      <div class="tbl"><table class="hist"><thead><tr><th class="l">Season</th><th>Record</th><th>Win%</th>
         ${lgIds.map(id => `<th class="l">League ${id} owner</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
       <h3>Drafted by</h3>
       <div class="tbl"><div class="scroll"><table><thead><tr><th class="l">Owner</th><th>Times</th><th>Avg pick</th><th>Their record</th><th class="l">Seasons</th></tr></thead>
