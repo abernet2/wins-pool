@@ -1,0 +1,38 @@
+name: Update wins
+
+on:
+  schedule:
+    # Games run Thu night through Mon night (US time); UTC days Thu-Tue cover that.
+    - cron: "*/30 * * * 0,1,2,4,5,6"
+    # One check midweek to catch stat corrections.
+    - cron: "0 12 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: update-wins
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch records from ESPN
+        run: python3 scripts/fetch_wins.py
+      - name: Commit and publish if changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "$(git status --porcelain data/wins.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/wins.json
+            git commit -m "Update team records"
+            git push
+            # Pushes made with GITHUB_TOKEN don't always trigger a Pages build.
+            gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent
+          fi

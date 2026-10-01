@@ -110,7 +110,8 @@ function standingsTable(lg, c) {
 }
 
 load().then(({ league, wins }) => {
-  document.getElementById("sub").textContent = `${league.season} season · regular season only`;
+  const upd = wins.updated ? ` · updated ${new Date(wins.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
+  document.getElementById("sub").textContent = `${league.season} season · regular season only${upd}`;
   document.getElementById("root").innerHTML = league.leagues.map(lg => {
     const c = computeLeague(lg, wins.teams);
     return `<section><h2>${lg.name}<span class="pot">$${lg.buyIn} buy-in · $${c.pot} pot · winner takes all</span></h2>
