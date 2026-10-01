@@ -433,11 +433,13 @@ window.addEventListener("hashchange", render);
 // Shows when the site files were last changed (the server's Last-Modified for app.js), so you can tell at a
 // glance that the browser is running the latest version.
 function stampBuild() {
-  fetch("app.js", { method: "HEAD", cache: "no-store" }).then(r => {
-    const lm = r.headers.get("last-modified");
-    if (!lm || !$("build")) return;
-    $("build").textContent = " · build " + new Date(lm).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-  }).catch(() => {});
+  const vp = () => `${innerWidth}×${innerHeight}${devicePixelRatio > 1 ? " @" + devicePixelRatio + "x" : ""}`;
+  const css = getComputedStyle(document.documentElement).getPropertyValue("--css-version").trim().replace(/"/g, "");
+  const show = lm => { if (!$("build")) return;
+    $("build").innerHTML = (lm ? " · build " + esc(new Date(lm).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "")
+      + (css ? ` · css ${esc(css)}` : ` · <b class="stale">css STALE</b>`) + ` · ${vp()}`; };
+  fetch("app.js", { method: "HEAD", cache: "no-store" }).then(r => show(r.headers.get("last-modified"))).catch(() => show(null));
+  window.addEventListener("resize", () => show(null));
 }
 
 initThemes();
