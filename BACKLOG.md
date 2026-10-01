@@ -9,7 +9,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
   - Spread-based "ATS" needs a final score plus the closing spread per game, both of which we can get from these endpoints.
 - **Weekly projections.** See how you and others are slated to perform in the coming week, and how that changes the standings.
   - Needs the upcoming schedule and some win-probability or spread source.
-- **Style changes.** The current look is deliberately basic. To be discussed in more depth before any work.
+- **Style: refine.** First pass shipped (dense layout, three switchable themes). Iterate from feedback.
 - **Mobile friendly.** Make sure every view works well on a phone. The standings and draft tables currently scroll sideways on narrow screens, which is a stopgap.
 
 ## Ideas
@@ -38,6 +38,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Done
 
+- Dense side-by-side layout with a switchable theme system (Terminal, Broadcast, Brutalist). Tokens live in `style.css`; `?theme=` in the URL or the header switcher picks one, and the choice is remembered.
 - Season view with draft order and standings for both leagues (2026-27).
 - Live ESPN feed via a scheduled GitHub Action.
 - 💩 / 🔥 weekly callouts: per-week owner wins, latest-week headline, season tallies. Ties share the callout; no callout if every owner won the same number of games; callouts only for finished weeks.

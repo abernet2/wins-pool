@@ -1,63 +1,48 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="terminal">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NFL Wins Pool</title>
-<style>
-  :root {
-    --bg: #f5f6f8; --card: #fff; --ink: #1b1f27; --muted: #6a7280; --line: #e3e6eb;
-    --promo: #1a7f37; --rel: #c62828;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #14171c; --card: #1c2027; --ink: #e8eaee; --muted: #8b94a3; --line: #2d333d;
-            --promo: #4cc26b; --rel: #ef6b66; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 14px/1.4 system-ui, sans-serif; padding: 24px 16px; }
-  main { max-width: 1280px; margin: 0 auto; }
-  h1 { margin: 0 0 4px; font-size: 24px; }
-  .sub { color: var(--muted); margin-bottom: 24px; }
-  section { margin-bottom: 36px; }
-  h2 { font-size: 18px; margin: 0 0 10px; }
-  .pot { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; white-space: nowrap; }
-  th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
-  th:first-child, td:first-child, .l { text-align: left; }
-  tr:last-child td { border-bottom: 0; }
-  .num { font-variant-numeric: tabular-nums; }
-  .rank { color: var(--muted); width: 2em; }
-  .owner { font-weight: 600; }
-  .tag { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 99px; margin-left: 6px; }
-  .tag.promo { color: var(--promo); border: 1px solid var(--promo); }
-  .tag.rel { color: var(--rel); border: 1px solid var(--rel); }
-  .money.pos { color: var(--promo); font-weight: 600; }
-  .muted { color: var(--muted); }
-  .err { padding: 16px; color: var(--rel); }
-  .headline { padding: 10px 14px; margin-bottom: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  details { margin-top: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  summary { cursor: pointer; padding: 10px 14px; font-weight: 600; user-select: none; }
-  details[open] > summary { border-bottom: 1px solid var(--line); }
-  details .scroll { overflow-x: auto; }
-  .headline b { margin-right: 4px; }
-  .hl-row { display: flex; flex-wrap: wrap; gap: 4px 20px; }
-  .wk { text-align: center; min-width: 3.2em; }
-  .wk.live { color: var(--muted); font-style: italic; }
-  .sub2 { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 8px; }
-</style>
+<script>
+  // Set the theme before first paint: ?theme=… beats the saved choice, then OS preference.
+  (function () {
+    var themes = ["terminal", "broadcast", "brutalist"], t;
+    try { t = new URLSearchParams(location.search).get("theme") || localStorage.getItem("theme"); } catch (e) {}
+    if (themes.indexOf(t) < 0) t = matchMedia("(prefers-color-scheme: light)").matches ? "brutalist" : "terminal";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
-  <h1>NFL Wins Pool</h1>
-  <div class="sub" id="sub">Loading…</div>
-  <div id="root"></div>
+  <header>
+    <h1>NFL <i>Wins</i> Pool</h1>
+    <div class="sub" id="sub">Loading…</div>
+    <div class="themes" id="themes" role="group" aria-label="Theme"></div>
+  </header>
+  <div id="root" class="leagues"></div>
+  <div class="legend"><i style="color:var(--promo)">▌</i> promotion zone &nbsp; <i style="color:var(--rel)">▌</i> relegation zone &nbsp; · &nbsp; 🔥 most wins in a week &nbsp; 💩 fewest &nbsp; · &nbsp; ties broken by historic win %</div>
 </main>
 <script>
+const THEMES = [["terminal", "Terminal"], ["broadcast", "Broadcast"], ["brutalist", "Brutalist"]];
 const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const money = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(0);
+
+function initThemes() {
+  const el = document.getElementById("themes");
+  const render = () => { el.innerHTML = THEMES.map(([k, n]) =>
+    `<button data-t="${k}" aria-pressed="${document.documentElement.dataset.theme === k}">${n}</button>`).join(""); };
+  el.addEventListener("click", e => {
+    const t = e.target.dataset && e.target.dataset.t;
+    if (!t) return;
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem("theme", t); } catch (err) {}
+    render();
+  });
+  render();
+}
 
 async function load() {
   const [league, wins, weeks] = await Promise.all(
@@ -90,36 +75,6 @@ function computeLeague(lg, teams) {
   return { rows, pot };
 }
 
-function heat(row, rows) {
-  const max = Math.max(...rows.map(r => r.w)), min = Math.min(...rows.map(r => r.w));
-  const x = max === min ? 0.5 : (row.w - min) / (max - min);
-  const rgb = x >= 0.5 ? "52,168,83" : "217,83,79";
-  return `rgba(${rgb}, ${(Math.abs(x - 0.5) * 0.7).toFixed(2)})`;
-}
-
-function draftTable(lg, teams) {
-  const body = lg.picks.map(p => {
-    const r = teams[p.team] || { w: 0, l: 0, t: 0 };
-    return `<tr><td class="num muted">${p.pick}</td><td class="l">${p.team}</td>
-      <td class="l owner">${p.owner}</td><td class="num">${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td></tr>`;
-  }).join("");
-  return `<table><thead><tr><th>Pick</th><th class="l">Team</th><th class="l">Owner</th><th>Record</th></tr></thead>
-    <tbody>${body}</tbody></table>`;
-}
-
-function standingsTable(lg, c, co) {
-  const tally = co && co.nums.length;
-  const body = c.rows.map(r => `<tr style="background:${heat(r, c.rows)}">
-    <td class="num rank">${r.rank}</td>
-    <td class="l owner">${r.name}${r.zone === "promo" ? '<span class="tag promo">Promotion</span>' : ""}${r.zone === "rel" ? '<span class="tag rel">Relegation</span>' : ""}</td>
-    <td class="num">${r.w}</td><td class="num">${r.l}</td><td class="num">${r.t}</td><td class="num">${r.g}</td>
-    <td class="num">${pct(r.pct)}</td><td class="num muted">${pct(r.hist)}</td>
-    ${tally ? `<td class="num">${co.byOwner[r.name].fire}</td><td class="num">${co.byOwner[r.name].poop}</td>` : ""}
-    <td class="num money ${r.net > 0 ? "pos" : ""}">${money(r.net)}</td></tr>`).join("");
-  return `<table><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
-    <th>Win %</th><th>Hist %</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net $</th></tr></thead><tbody>${body}</tbody></table>`;
-}
-
 // Weekly callouts: per league, the owner(s) with the most wins in a finished week get 🔥,
 // the owner(s) with the fewest get 💩. Ties share the callout; nobody is called out if
 // every owner won the same number of games.
@@ -149,47 +104,70 @@ function computeCallouts(lg, weeks) {
   return out;
 }
 
-function headline(c) {
+function strip(c) {
   const done = c.nums.filter(n => c.weeks[n].complete);
   const last = done[done.length - 1];
   if (!last) return "";
-  return `<div class="headline"><b>Week ${last}</b>
-    <div class="hl-row"><span>🔥 ${c.weeks[last].fire.join(", ") || "—"}</span>
-    <span>💩 ${c.weeks[last].poop.join(", ") || "—"}</span></div></div>`;
+  return `<div class="strip"><b>Wk ${last}</b><span>🔥 ${c.weeks[last].fire.join(", ") || "—"}</span>
+    <span>💩 ${c.weeks[last].poop.join(", ") || "—"}</span></div>`;
+}
+
+function standingsTable(c, co) {
+  const tally = co.nums.length > 0;
+  const maxW = Math.max(1, ...c.rows.map(r => r.w));
+  const body = c.rows.map(r => `<tr class="${r.zone ? "z-" + r.zone : ""}">
+    <td class="rank">${r.rank}</td><td class="l owner">${r.name}</td>
+    <td class="w" style="--p:${Math.round(r.w / maxW * 100)}%">${r.w}</td>
+    <td>${r.l}</td><td>${r.t}</td><td class="dim">${r.g}</td>
+    <td>${pct(r.pct)}</td><td class="dim">${pct(r.hist)}</td>
+    ${tally ? `<td>${co.byOwner[r.name].fire}</td><td>${co.byOwner[r.name].poop}</td>` : ""}
+    <td class="${r.net > 0 ? "pos" : "dim"}">${money(r.net)}</td></tr>`).join("");
+  return `<table><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
+    <th>Win%</th><th>Hist%</th>${tally ? "<th>🔥</th><th>💩</th>" : ""}<th>Net</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function draftTable(lg, teams) {
+  const body = lg.picks.map(p => {
+    const r = teams[p.team] || { w: 0, l: 0, t: 0 };
+    return `<tr><td class="dim">${p.pick}</td><td class="l">${p.team}</td>
+      <td class="l owner">${p.owner}</td><td>${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th>Pick</th><th class="l">Team</th><th class="l">Owner</th><th>Rec</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
 }
 
 function weeklyGrid(c, rows) {
-  const th = c.nums.map(n => `<th class="wk">${n}</th>`).join("");
+  const th = c.nums.map(n => `<th class="wk${c.weeks[n].complete ? "" : " live"}">${n}</th>`).join("");
   const body = rows.map(r => {
     const o = c.byOwner[r.name];
     const cells = c.nums.map(n => {
       const i = c.weeks[n];
       const mark = i.fire.includes(r.name) ? " 🔥" : i.poop.includes(r.name) ? " 💩" : "";
-      return `<td class="num wk${i.complete ? "" : " live"}">${o.wins[n]}${mark}</td>`;
+      return `<td class="wk${i.complete ? "" : " live"}">${o.wins[n]}${mark}</td>`;
     }).join("");
     return `<tr><td class="l owner">${r.name}</td>${cells}</tr>`;
   }).join("");
-  return `<table><thead><tr><th class="l">Wins by week</th>${th}</tr></thead><tbody>${body}</tbody></table>`;
+  return `<table><thead><tr><th class="l">Wins / wk</th>${th}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
+initThemes();
 load().then(({ league, wins, weeks }) => {
   const upd = wins.updated ? ` · updated ${new Date(wins.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
-  document.getElementById("sub").textContent = `${league.season} season · regular season only${upd}`;
+  document.getElementById("sub").textContent = `${league.season} · regular season${upd}`;
   document.getElementById("root").innerHTML = league.leagues.map(lg => {
     const c = computeLeague(lg, wins.teams);
     const co = computeCallouts(lg, weeks);
-    const has = co.nums.length;
-    return `<section><h2>${lg.name}<span class="pot">$${lg.buyIn} buy-in · $${c.pot} pot · winner takes all</span></h2>
-      ${has ? headline(co) : ""}
-      <div class="card">${standingsTable(lg, c, co)}</div>
+    return `<section><h2>${lg.name}<small>$${lg.buyIn} × ${lg.owners.length} = $${c.pot} · winner takes all</small></h2>
+      ${strip(co)}
+      <div class="tbl">${standingsTable(c, co)}</div>
       <details><summary>Draft order</summary><div class="scroll">${draftTable(lg, wins.teams)}</div></details>
-      ${has ? `<details><summary>Weekly wins</summary><div class="scroll">${weeklyGrid(co, c.rows)}</div></details>` : ""}
+      ${co.nums.length ? `<details><summary>Weekly wins</summary><div class="scroll">${weeklyGrid(co, c.rows)}</div></details>` : ""}
     </section>`;
   }).join("");
 }).catch(e => {
   document.getElementById("sub").textContent = "";
   document.getElementById("root").innerHTML =
-    `<div class="card err">Could not load data (${e.message}). Serve this folder over http, e.g. <code>python3 -m http.server</code>.</div>`;
+    `<div class="err">Could not load data (${e.message}). Serve this folder over http, e.g. <code>python3 -m http.server</code>.</div>`;
 });
 </script>
 </body>
