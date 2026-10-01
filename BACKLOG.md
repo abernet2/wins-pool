@@ -7,6 +7,12 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 - **ATS (against the spread) stats.** Show how each team, and so each owner, performs against the spread.
   - Odds source (checked 2026-09-30): ESPN's unauthenticated APIs carry DraftKings odds. The scoreboard (`site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`) has spread, over/under and moneylines for upcoming games but not finished ones. The core API (`sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/{id}/competitions/{id}/odds`) returned open and close lines for a finished week 1 game, so historic spreads look available. Still to verify: coverage across all games, and how long ESPN keeps them.
   - Spread-based "ATS" needs a final score plus the closing spread per game, both of which we can get from these endpoints.
+- **Resource pages (read-only).** A hash-routed page per resource, so every view is linkable: season `#/2026-27`, league `#/2026-27/league/1`, player `#/player/Jack`, team `#/team/Buffalo`. Names in tables become links.
+  - Needs per-season data folders (`data/<season>/league.json|wins.json|weeks.json`) and a `data/seasons.json` index; the importer and fetch script take a season argument.
+  - Player page: seasons played, league and finish per season, 🔥/💩 totals, money, best and worst picks. Team page: wins per season and who drafted it.
+  - Past seasons need backfilling from the old sheets (not yet provided).
+- **Hall of Fame / Shame.** Across all seasons: highest and lowest season win %, most and fewest wins, most titles and relegations, most 🔥/💩, best and worst weeks (4-0 or 0-4), best and worst picks, longest streaks.
+- **"Log in" as a person.** Choose a name once (saved in the browser, no auth). Highlights your row everywhere and opens your player page by default. Depends on resource pages.
 - **Weekly projections.** See how you and others are slated to perform in the coming week, and how that changes the standings.
   - Needs the upcoming schedule and some win-probability or spread source.
 - **Style: refine.** First pass shipped (dense layout, three switchable themes). Iterate from feedback.
@@ -15,6 +21,12 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 ## Ideas
 
 ### Standings readability
+- Rank bump chart: positions by week across the season (falls out of the weekly data).
+- "This week" panel: games grouped by owner, with owner-vs-owner matchups when two owners hold both sides.
+- Copy-to-clipboard weekly summary (standings plus 🔥/💩) for the group chat.
+- Trash-talk stats: luckiest owner (wins vs. spread expectations), most costly team, streaks.
+- Draft-pick grading per season.
+- Clinch and elimination badges.
 - Expandable owner rows showing each of their 4 teams and its record.
 - Movement arrows showing rank change since last week.
 - A dividing line above the promotion and relegation spots, plus a "safe by N wins" gap to the cutoff.
