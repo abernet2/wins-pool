@@ -4,10 +4,6 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Requested
 
-- **💩 / 🔥 weekly callouts.** Each week, the owner with the most wins gets 🔥 and the owner with the fewest gets 💩. Keep a running tally of who has collected the most of each across the season.
-  - Open: is "most wins" wins *gained that week* or total wins? (Assumed: gained that week.)
-  - Open: how to handle weekly ties, and whether callouts are per league or across both.
-  - Needs weekly snapshots of team records (the Action's history of `data/wins.json` commits, or an explicit `data/history/` file).
 - **ATS (against the spread) stats.** Show how each team, and so each owner, performs against the spread.
   - Needs a source for spreads and results. Check whether ESPN's odds data covers it before committing to this.
 - **Weekly projections.** See how you and others are slated to perform in the coming week, and how that changes the standings.
@@ -43,3 +39,4 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 - Season view with draft order and standings for both leagues (2026-27).
 - Live ESPN feed via a scheduled GitHub Action.
+- 💩 / 🔥 weekly callouts: per-week owner wins, latest-week headline, season tallies. Ties share the callout; no callout if every owner won the same number of games; callouts only for finished weeks.

@@ -39,6 +39,13 @@
   .money.pos { color: var(--promo); font-weight: 600; }
   .muted { color: var(--muted); }
   .err { padding: 16px; color: var(--rel); }
+  .callouts { margin-top: 16px; }
+  .headline { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .headline b { margin-right: 4px; }
+  .hl-row { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+  .wk { text-align: center; min-width: 3.2em; }
+  .wk.live { color: var(--muted); font-style: italic; }
+  .sub2 { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 8px; }
 </style>
 </head>
 <body>
@@ -52,9 +59,10 @@ const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
 const money = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(0);
 
 async function load() {
-  const [league, wins] = await Promise.all(
-    ["data/league.json", "data/wins.json"].map(u => fetch(u, { cache: "no-store" }).then(r => r.json())));
-  return { league, wins };
+  const [league, wins, weeks] = await Promise.all(
+    ["data/league.json", "data/wins.json", "data/weeks.json"].map(u =>
+      fetch(u, { cache: "no-store" }).then(r => r.ok ? r.json() : null)));
+  return { league, wins, weeks: weeks ? weeks.weeks : {} };
 }
 
 // Sum an owner's team records for the league.
@@ -109,14 +117,65 @@ function standingsTable(lg, c) {
     <th>Win %</th><th>Hist %</th><th>Net $</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
-load().then(({ league, wins }) => {
+// Weekly callouts: per league, the owner(s) with the most wins in a finished week get 🔥,
+// the owner(s) with the fewest get 💩. Ties share the callout; nobody is called out if
+// every owner won the same number of games.
+function computeCallouts(lg, weeks) {
+  const teamsByOwner = {};
+  lg.picks.forEach(p => (teamsByOwner[p.owner] ||= []).push(p.team));
+  const nums = Object.keys(weeks).map(Number).sort((a, b) => a - b);
+  const out = { nums, byOwner: {}, weeks: {} };
+  lg.owners.forEach(o => out.byOwner[o.name] = { fire: 0, poop: 0, wins: {} });
+  nums.forEach(n => {
+    const wk = weeks[n];
+    const wins = {};
+    lg.owners.forEach(o => {
+      wins[o.name] = teamsByOwner[o.name].filter(t => wk.results[t] === "W").length;
+      out.byOwner[o.name].wins[n] = wins[o.name];
+    });
+    const vals = Object.values(wins), max = Math.max(...vals), min = Math.min(...vals);
+    const info = { complete: wk.complete, fire: [], poop: [] };
+    if (wk.complete && max !== min) {
+      lg.owners.forEach(o => {
+        if (wins[o.name] === max) { info.fire.push(o.name); out.byOwner[o.name].fire++; }
+        if (wins[o.name] === min) { info.poop.push(o.name); out.byOwner[o.name].poop++; }
+      });
+    }
+    out.weeks[n] = info;
+  });
+  return out;
+}
+
+function callout(lg, c, rows) {
+  if (!c.nums.length) return "";
+  const done = c.nums.filter(n => c.weeks[n].complete);
+  const last = done[done.length - 1];
+  const head = last ? `<div class="headline"><b>Week ${last}</b>
+    <div class="hl-row"><span>🔥 ${c.weeks[last].fire.join(", ") || "—"}</span>
+    <span>💩 ${c.weeks[last].poop.join(", ") || "—"}</span></div></div>` : "";
+  const th = c.nums.map(n => `<th class="wk">${n}</th>`).join("");
+  const body = rows.map(r => {
+    const o = c.byOwner[r.name];
+    const cells = c.nums.map(n => {
+      const i = c.weeks[n];
+      const mark = i.fire.includes(r.name) ? " 🔥" : i.poop.includes(r.name) ? " 💩" : "";
+      return `<td class="num wk${i.complete ? "" : " live"}">${o.wins[n]}${mark}</td>`;
+    }).join("");
+    return `<tr><td class="l owner">${r.name}</td>${cells}<td class="num wk">${o.fire}</td><td class="num wk">${o.poop}</td></tr>`;
+  }).join("");
+  return `<div class="card callouts">${head}<table><thead><tr><th class="l">Weekly wins</th>${th}
+    <th class="wk">🔥</th><th class="wk">💩</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+load().then(({ league, wins, weeks }) => {
   const upd = wins.updated ? ` · updated ${new Date(wins.updated).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}` : "";
   document.getElementById("sub").textContent = `${league.season} season · regular season only${upd}`;
   document.getElementById("root").innerHTML = league.leagues.map(lg => {
     const c = computeLeague(lg, wins.teams);
     return `<section><h2>${lg.name}<span class="pot">$${lg.buyIn} buy-in · $${c.pot} pot · winner takes all</span></h2>
       <div class="grid"><div class="card">${draftTable(lg, wins.teams)}</div>
-      <div class="card">${standingsTable(lg, c)}</div></div></section>`;
+      <div class="card">${standingsTable(lg, c)}</div></div>
+      ${callout(lg, computeCallouts(lg, weeks), c.rows)}</section>`;
   }).join("");
 }).catch(e => {
   document.getElementById("sub").textContent = "";
