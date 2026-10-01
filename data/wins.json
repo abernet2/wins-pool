@@ -1,0 +1,165 @@
+{
+  "season": "2026-27",
+  "teams": {
+    "L.A. Rams": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Baltimore": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Seattle": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Buffalo": {
+      "w": 3,
+      "l": 0,
+      "t": 0
+    },
+    "Philadelphia": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Detroit": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Green Bay": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "San Francisco": {
+      "w": 3,
+      "l": 0,
+      "t": 0
+    },
+    "Cincinnati": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Kansas City": {
+      "w": 3,
+      "l": 0,
+      "t": 0
+    },
+    "Denver": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "New England": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Houston": {
+      "w": 0,
+      "l": 3,
+      "t": 0
+    },
+    "Dallas": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "L.A. Chargers": {
+      "w": 0,
+      "l": 3,
+      "t": 0
+    },
+    "Jacksonville": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Chicago": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Minnesota": {
+      "w": 3,
+      "l": 0,
+      "t": 0
+    },
+    "Tampa Bay": {
+      "w": 0,
+      "l": 3,
+      "t": 0
+    },
+    "Pittsburgh": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "New Orleans": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Indianapolis": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "N.Y. Giants": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "Carolina": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Washington": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Atlanta": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Tennessee": {
+      "w": 0,
+      "l": 3,
+      "t": 0
+    },
+    "Las Vegas": {
+      "w": 3,
+      "l": 0,
+      "t": 0
+    },
+    "Cleveland": {
+      "w": 2,
+      "l": 1,
+      "t": 0
+    },
+    "N.Y. Jets": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Arizona": {
+      "w": 1,
+      "l": 2,
+      "t": 0
+    },
+    "Miami": {
+      "w": 0,
+      "l": 3,
+      "t": 0
+    }
+  }
+}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFL Wins Pool</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --ink: #1b1f27; --muted: #6a7280; --line: #e3e6eb;
+    --promo: #1a7f37; --rel: #c62828;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14171c; --card: #1c2027; --ink: #e8eaee; --muted: #8b94a3; --line: #2d333d;
+            --promo: #4cc26b; --rel: #ef6b66; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.4 system-ui, sans-serif; padding: 24px 16px; }
+  main { max-width: 1280px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 24px; }
+  .sub { color: var(--muted); margin-bottom: 24px; }
+  section { margin-bottom: 36px; }
+  h2 { font-size: 18px; margin: 0 0 10px; }
+  .pot { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+  th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+  th:first-child, td:first-child, .l { text-align: left; }
+  tr:last-child td { border-bottom: 0; }
+  .num { font-variant-numeric: tabular-nums; }
+  .rank { color: var(--muted); width: 2em; }
+  .owner { font-weight: 600; }
+  .tag { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 99px; margin-left: 6px; }
+  .tag.promo { color: var(--promo); border: 1px solid var(--promo); }
+  .tag.rel { color: var(--rel); border: 1px solid var(--rel); }
+  .money.pos { color: var(--promo); font-weight: 600; }
+  .muted { color: var(--muted); }
+  .err { padding: 16px; color: var(--rel); }
+</style>
+</head>
+<body>
+<main>
+  <h1>NFL Wins Pool</h1>
+  <div class="sub" id="sub">Loading…</div>
+  <div id="root"></div>
+</main>
+<script>
+const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
+const money = n => (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(0);
+
+async function load() {
+  const [league, wins] = await Promise.all(
+    ["data/league.json", "data/wins.json"].map(u => fetch(u, { cache: "no-store" }).then(r => r.json())));
+  return { league, wins };
+}
+
+// Sum an owner's team records for the league.
+function computeLeague(lg, teams) {
+  const picksByOwner = {};
+  lg.picks.forEach(p => (picksByOwner[p.owner] ||= []).push(p));
+  const rows = lg.owners.map(o => {
+    const mine = picksByOwner[o.name] || [];
+    const s = { w: 0, l: 0, t: 0 };
+    mine.forEach(p => { const r = teams[p.team] || { w: 0, l: 0, t: 0 }; s.w += r.w; s.l += r.l; s.t += r.t; });
+    const g = s.w + s.l + s.t;
+    return { ...o, ...s, g, pct: g ? s.w / g : 0 };
+  });
+  // Standings: most wins, then historic win %.
+  rows.sort((a, b) => b.w - a.w || b.hist - a.hist);
+  rows.forEach((r, i) => r.rank = i + 1);
+  // Promotion/relegation tiebreakers: wins, then most ties, then historic win %.
+  const pr = [...rows].sort((a, b) => b.w - a.w || b.t - a.t || b.hist - a.hist);
+  pr.slice(0, lg.promote).forEach(r => r.zone = "promo");
+  if (lg.relegate) pr.slice(-lg.relegate).forEach(r => r.zone = "rel");
+  // Winner takes the pot.
+  const pot = lg.buyIn * rows.length;
+  rows.forEach(r => r.net = (r.rank === 1 ? pot : 0) - lg.buyIn);
+  return { rows, pot };
+}
+
+function heat(row, rows) {
+  const max = Math.max(...rows.map(r => r.w)), min = Math.min(...rows.map(r => r.w));
+  const x = max === min ? 0.5 : (row.w - min) / (max - min);
+  const rgb = x >= 0.5 ? "52,168,83" : "217,83,79";
+  return `rgba(${rgb}, ${(Math.abs(x - 0.5) * 0.7).toFixed(2)})`;
+}
+
+function draftTable(lg, teams) {
+  const body = lg.picks.map(p => {
+    const r = teams[p.team] || { w: 0, l: 0, t: 0 };
+    return `<tr><td class="num muted">${p.pick}</td><td class="l">${p.team}</td>
+      <td class="l owner">${p.owner}</td><td class="num">${r.w}-${r.l}${r.t ? "-" + r.t : ""}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th>Pick</th><th class="l">Team</th><th class="l">Owner</th><th>Record</th></tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
+
+function standingsTable(lg, c) {
+  const body = c.rows.map(r => `<tr style="background:${heat(r, c.rows)}">
+    <td class="num rank">${r.rank}</td>
+    <td class="l owner">${r.name}${r.zone === "promo" ? '<span class="tag promo">Promotion</span>' : ""}${r.zone === "rel" ? '<span class="tag rel">Relegation</span>' : ""}</td>
+    <td class="num">${r.w}</td><td class="num">${r.l}</td><td class="num">${r.t}</td><td class="num">${r.g}</td>
+    <td class="num">${pct(r.pct)}</td><td class="num muted">${pct(r.hist)}</td>
+    <td class="num money ${r.net > 0 ? "pos" : ""}">${money(r.net)}</td></tr>`).join("");
+  return `<table><thead><tr><th>#</th><th class="l">Owner</th><th>W</th><th>L</th><th>T</th><th>GP</th>
+    <th>Win %</th><th>Hist %</th><th>Net $</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+
+load().then(({ league, wins }) => {
+  document.getElementById("sub").textContent = `${league.season} season · regular season only`;
+  document.getElementById("root").innerHTML = league.leagues.map(lg => {
+    const c = computeLeague(lg, wins.teams);
+    return `<section><h2>${lg.name}<span class="pot">$${lg.buyIn} buy-in · $${c.pot} pot · winner takes all</span></h2>
+      <div class="grid"><div class="card">${draftTable(lg, wins.teams)}</div>
+      <div class="card">${standingsTable(lg, c)}</div></div></section>`;
+  }).join("");
+}).catch(e => {
+  document.getElementById("sub").textContent = "";
+  document.getElementById("root").innerHTML =
+    `<div class="card err">Could not load data (${e.message}). Serve this folder over http, e.g. <code>python3 -m http.server</code>.</div>`;
+});
+</script>
+</body>
+</html>
