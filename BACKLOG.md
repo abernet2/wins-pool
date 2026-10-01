@@ -50,6 +50,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Done
 
+- Per-season data folders (`data/<season>/`), hash router, first-pass player, team and league pages, and an "I'm me" button on player pages (saved in the browser; highlights your row and adds a ★ link in the header).
 - Dense side-by-side layout with a switchable theme system (Terminal, Broadcast, Brutalist). Tokens live in `style.css`; `?theme=` in the URL or the header switcher picks one, and the choice is remembered.
 - Season view with draft order and standings for both leagues (2026-27).
 - Live ESPN feed via a scheduled GitHub Action.

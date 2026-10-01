@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Convert a season's Google Sheets CSV export into data/league.json + data/wins.json.
+"""Convert a season's Google Sheets CSV export into data/<season>/league.json + wins.json
+and register the season in data/seasons.json.
 
 Usage: scripts/import_sheet.py data/sheets/2026-27.csv
 Draft picks and owner historic win % are read from the sheet; team records
@@ -41,8 +42,15 @@ league = {
          "owners": owners[2], "picks": picks[2]},
     ],
 }
-out = pathlib.Path(__file__).resolve().parent.parent / "data"
+data = pathlib.Path(__file__).resolve().parent.parent / "data"
+out = data / season
+out.mkdir(exist_ok=True)
 (out / "league.json").write_text(json.dumps(league, indent=2) + "\n")
 (out / "wins.json").write_text(json.dumps({"season": season, "teams": records}, indent=2) + "\n")
+idx = data / "seasons.json"
+seasons = json.loads(idx.read_text()) if idx.exists() else {"current": season, "seasons": []}
+if season not in seasons["seasons"]:
+    seasons["seasons"] = sorted(seasons["seasons"] + [season])
+idx.write_text(json.dumps(seasons, indent=2) + "\n")
 print(f"{season}: {sum(len(v) for v in picks.values())} picks, {len(records)} teams, "
       f"{len(owners[1])}+{len(owners[2])} owners")

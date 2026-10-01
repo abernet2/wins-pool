@@ -8,7 +8,8 @@ scheduled Action doesn't create empty commits. Stdlib only.
 import json, pathlib, sys, urllib.request
 from datetime import datetime, timezone
 
-SEASON = 2026  # NFL season year (the 2026-27 pool)
+SEASON = int(sys.argv[1]) if len(sys.argv) > 1 else 2026  # NFL season year (2026 = the 2026-27 pool)
+LABEL = f"{SEASON}-{(SEASON + 1) % 100:02d}"
 URL = f"https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season={SEASON}&type=2"
 SCOREBOARD = ("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
               f"?seasontype=2&dates={SEASON}")
@@ -84,7 +85,7 @@ def write_if_changed(path, new):
     return True
 
 def main():
-    data = pathlib.Path(__file__).resolve().parent.parent / "data"
+    data = pathlib.Path(__file__).resolve().parent.parent / "data" / LABEL
     changed = []
 
     wins_path = data / "wins.json"
