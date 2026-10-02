@@ -42,19 +42,40 @@ async function load() {
 
 // ---- routing ----
 let CTX;
+const phone = matchMedia("(max-width: 600px)");   // the chart has a narrower layout on phones
 function render() {
   const me = getMe();
-  $("app").innerHTML = route(location.hash, CTX, me);
+  $("app").innerHTML = route(location.hash, CTX, me, { compact: phone.matches });
   $("me").innerHTML = me ? `<a href="#/player/${encodeURIComponent(me)}" class="meLink">★ ${esc(me)}</a>` : "";
   window.scrollTo(0, 0);
 }
 
+// Tap a chart line or name to focus that owner (everyone else fades); tap it again to clear.
+function focusChart(chart, owner) {
+  const same = chart.dataset.focus === owner;
+  chart.querySelectorAll(".on").forEach(el => el.classList.remove("on"));
+  const readout = chart.querySelector(".ch-readout");
+  if (same) {
+    delete chart.dataset.focus;
+    readout.textContent = "Wins behind the leader after each finished week. Tap a line or a name to focus it.";
+    return;
+  }
+  chart.dataset.focus = owner;
+  const els = [...chart.querySelectorAll("[data-owner]")].filter(el => el.dataset.owner === owner);
+  els.forEach(el => el.classList.add("on"));
+  const d = els[0].dataset, gap = Number(d.gap);
+  readout.textContent = `${owner}: ${gap === 0 ? "leading" : `${-gap} win${gap === -1 ? "" : "s"} behind the leader`} after week ${d.week} (rank ${d.rank})`;
+}
+
 document.addEventListener("click", e => {
+  const hit = e.target.closest && e.target.closest(".chart [data-owner]");
+  if (hit) return focusChart(hit.closest(".chart"), hit.dataset.owner);
   if (!e.target.dataset || e.target.dataset.me === undefined) return;
   setMe(e.target.dataset.me || null);
   render();
 });
 window.addEventListener("hashchange", render);
+phone.addEventListener("change", () => CTX && render());
 
 // ---- debug stamp: which files are running, and what the browser is actually applying ----
 function stampBuild() {

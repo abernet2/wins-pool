@@ -3,6 +3,7 @@
   --bg: #0a0c0a; --fg: #d7e5d2; --muted: #6f8268; --line: #1e281d; --panel: #0f130f;
   --accent: #39ff88; --promo: #39ff88; --rel: #ff4d4d;
   --heat-hi: #2ee66b; --heat-mid: #ffd23f; --heat-lo: #ff4d4d;
+  --s1: #59c26b; --s2: #5b9bd5; --s3: #f39c3d; --s4: #ef6b6b; --s5: #5fd0c4; --s6: #e6c84a; --s7: #b98ad6; --s8: #ff9ec0;   /* chart lines */
   --font-ui: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
   --font-head: var(--font-ui); --font-num: var(--font-ui);
   --head-case: uppercase; --head-weight: 700; --head-track: .08em;
@@ -13,6 +14,7 @@
   --bg: #0d1320; --fg: #eef2f8; --muted: #7d8aa3; --line: #1f2a40; --panel: #121a2b;
   --accent: #ff5a1f; --promo: #2ee6a6; --rel: #ff5a1f;
   --heat-hi: #2ee6a6; --heat-mid: #ffb020; --heat-lo: #ff4a2e;
+  --s1: #2ee6a6; --s2: #5aa9ff; --s3: #ffb020; --s4: #ff6b5a; --s5: #52d6e0; --s6: #f2e04a; --s7: #c79bff; --s8: #ff9ec0;
   --font-ui: system-ui, "Segoe UI", Roboto, sans-serif;
   --font-head: Oswald, "Bebas Neue", Impact, "Arial Narrow", system-ui, sans-serif;
   --font-num: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
@@ -22,6 +24,7 @@
   --bg: #f3efe6; --fg: #000; --muted: #5c5a53; --line: #000; --panel: #fff;
   --accent: #ff2a00; --promo: #006b2e; --rel: #ff2a00;
   --heat-hi: #00b84a; --heat-mid: #ffc400; --heat-lo: #ff2a00;
+  --s1: #1a7f37; --s2: #1f5fbf; --s3: #c2570c; --s4: #c62828; --s5: #0b8a82; --s6: #9a7b00; --s7: #7b3fa0; --s8: #c2185b;
   --font-ui: "Helvetica Neue", Arial, system-ui, sans-serif; --font-head: var(--font-ui);
   --font-num: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
   --head-weight: 900; --head-track: .02em; --rule: 1px; --rule-strong: 3px;
@@ -220,3 +223,18 @@ h2 .short, h2 .more { display: none; }
 
 #build { color: var(--accent); }
 #build .stale { color: var(--rel); }
+
+/* ---- standings chart ---- */
+.chart svg { display: block; width: 100%; height: auto; max-width: 760px; }
+.ch-grid { stroke: var(--line); } .ch-zero { stroke: var(--muted); }
+.ch-ax { fill: var(--muted); font: 10px var(--font-ui); }
+.ch-line { fill: none; stroke-width: 1.6; stroke-linejoin: round; stroke-opacity: .8; }
+.ch-line.me { stroke-width: 3.2; stroke-opacity: 1; }
+.ch-hit { fill: none; stroke: transparent; stroke-width: 14; stroke-linejoin: round; cursor: pointer; }
+.ch-lbl { font: 11px var(--font-ui); cursor: pointer; }
+.ch-lbl.me { font-weight: 700; }
+.chart[data-focus] .ch-line, .chart[data-focus] .ch-lbl { opacity: .18; }
+.chart[data-focus] .on { opacity: 1; }
+.chart[data-focus] .ch-line.on { stroke-width: 3.2; stroke-opacity: 1; }
+.ch-readout { margin-top: 6px; min-height: 2.6em; color: var(--muted); font-size: 11px; }
+[data-theme="brutalist"] .ch-grid { stroke-opacity: .22; }

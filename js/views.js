@@ -1,6 +1,7 @@
 // Page builders. Each returns an HTML string for the given context (see calc.buildContext) and, where it
 // matters, `me` (the owner the visitor picked with "I'm me", or null). No DOM access.
 import { esc, pct, money, recStr, shortYear } from "./util.js";
+import { standingsChart } from "./chart.js";
 import { heatPosition, findOwner, ownerHistory, teamHistory, draftFrequency, draftersOf, winPct, sumRec } from "./calc.js";
 
 // ---- links and small pieces ----
@@ -111,13 +112,14 @@ function dashboard(ctx, me) {
   <div class="legend"><span><i style="color:var(--promo)">▌</i> promotion zone</span><span><i style="color:var(--rel)">▌</i> relegation zone</span><span>🔥 most wins in a week</span><span>💩 fewest</span><span>ties broken by historic win %</span></div>`;
 }
 
-function leaguePage(ctx, id, me) {
+function leaguePage(ctx, id, me, opts) {
   const e = ctx.byLeague[id];
   if (!e) return notFound("league");
-  const { lg, c, co } = e;
+  const { lg, c, co, series, ranks } = e;
   return `<div class="crumbs">${homeCrumb(ctx)} / ${esc(lg.name)}</div>
     <section class="narrow"><h2>${esc(lg.name)}<small>${potText(lg, c)}</small></h2>
     ${strip(co)}<div class="tbl">${standingsTable(c, co, me)}</div>
+    <h3>Standings over the season</h3>${standingsChart(lg, series, ranks, { me, compact: opts.compact })}
     <h3>Wins by week</h3><div class="tbl">${weeklyGrid(co, c.rows)}</div>
     <h3>Draft order</h3><div class="tbl">${draftTable(lg, ctx.teams, me)}</div></section>`;
 }
@@ -206,14 +208,14 @@ function teamPage(ctx, name, me) {
     </section>`;
 }
 
-/** The HTML for a location hash like "#/player/Mike%20B". */
-export function route(hash, ctx, me) {
+/** The HTML for a location hash like "#/player/Mike%20B". opts.compact picks the phone-sized layout of the chart. */
+export function route(hash, ctx, me, opts = {}) {
   const [, kind, arg] = (hash || "#/").split("/");
   let val = arg || null;
   try { if (arg) val = decodeURIComponent(arg); } catch (e) { /* malformed %-escape: use it as typed, it just won't match anything */ }
   return !kind ? dashboard(ctx, me)
     : kind === "player" ? playerPage(ctx, val, me)
     : kind === "team" ? teamPage(ctx, val, me)
-    : kind === "league" ? leaguePage(ctx, val, me)
+    : kind === "league" ? leaguePage(ctx, val, me, opts)
     : notFound("page");
 }
