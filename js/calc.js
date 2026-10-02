@@ -26,7 +26,8 @@ export const heatPosition = (v, min, max) => (max === min ? .5 : (v - min) / (ma
 // ---- current standings ----
 /**
  * Standings for one league. Rank is most wins, then historic win %. Promotion/relegation zones use a different
- * tiebreak (wins, then most ties, then historic win %). Net money assumes winner takes all.
+ * tiebreak (wins, then most ties, then historic win %). Net money: the pot goes to the owner(s) with the most wins,
+ * split equally when tied.
  */
 export function computeLeague(lg, teams) {
   const picks = byOwner(lg);
@@ -39,8 +40,10 @@ export function computeLeague(lg, teams) {
   const pr = [...rows].sort((a, b) => b.w - a.w || b.t - a.t || b.hist - a.hist);
   pr.slice(0, lg.promote).forEach(r => r.zone = "promo");
   if (lg.relegate) pr.slice(-lg.relegate).forEach(r => r.zone = "rel");
+  // Winner takes the pot; owners tied on the most wins split it (as the sheet has paid out, e.g. 2018-19, 2023-24).
   const pot = lg.buyIn * rows.length;
-  rows.forEach(r => r.net = (r.rank === 1 ? pot : 0) - lg.buyIn);
+  const leaders = rows.filter(r => r.w === rows[0].w);
+  rows.forEach(r => r.net = (r.w === rows[0].w ? pot / leaders.length : 0) - lg.buyIn);
   return { rows, pot };
 }
 
