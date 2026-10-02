@@ -50,7 +50,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 ## Done
 
 - Mobile layout (<=600px): no page overflow, trimmed standings columns, stacked history cards, three-across stat strips. Verified in headless Chromium at 320-600px; still worth a pass on a real phone.
-- Past seasons (2018-19 to 2025-26) imported from the workbook with `scripts/import_workbook.py` (needs openpyxl). Player pages show career totals, a previous-seasons table (league, finish, record, teams) and a teams-drafted frequency table.
+- Past seasons (2018-19 to 2025-26) imported from the workbook with `scripts/import_season.py` (.xlsx needs openpyxl). Player pages show career totals, a previous-seasons table (league, finish, record, teams) and a teams-drafted frequency table.
 - Per-season data folders (`data/<season>/`), hash router, first-pass player, team and league pages, and an "I'm me" button on player pages (saved in the browser; highlights your row and adds a ★ link in the header).
 - Dense side-by-side layout with a switchable theme system (Terminal, Broadcast, Brutalist). Tokens live in `style.css`; `?theme=` in the URL or the header switcher picks one, and the choice is remembered.
 - Season view with draft order and standings for both leagues (2026-27).
