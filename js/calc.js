@@ -75,17 +75,30 @@ export function computeCallouts(lg, weeks) {
   return out;
 }
 
-/** Rank after each finished week (cumulative wins, ties by historic win %): { owner: { week: rank } }. */
-export function rankHistory(lg, weeks) {
+/**
+ * Each owner's cumulative wins after every FINISHED week, and how far behind the week's leader they were:
+ * { weeks: [1, 2, ...], wins: {owner: [...]}, lead: [...], behind: {owner: [...]} }  (behind is 0 for the leader, else negative).
+ */
+export function standingsSeries(lg, weeks) {
   const teams = byOwner(lg, p => p.team);
   const nums = weekNumbers(weeks).filter(n => weeks[n].complete);
   const total = Object.fromEntries(lg.owners.map(o => [o.name, 0]));
-  const out = Object.fromEntries(lg.owners.map(o => [o.name, {}]));
+  const wins = Object.fromEntries(lg.owners.map(o => [o.name, []]));
+  const lead = [];
   nums.forEach(n => {
-    lg.owners.forEach(o => total[o.name] += weekWins(teams[o.name], weeks[n]));
-    [...lg.owners].sort((a, b) => total[b.name] - total[a.name] || b.hist - a.hist)
-      .forEach((o, i) => out[o.name][n] = i + 1);
+    lg.owners.forEach(o => { total[o.name] += weekWins(teams[o.name], weeks[n]); wins[o.name].push(total[o.name]); });
+    lead.push(Math.max(...Object.values(total)));
   });
+  const behind = Object.fromEntries(lg.owners.map(o => [o.name, wins[o.name].map((w, i) => w - lead[i])]));
+  return { weeks: nums, wins, lead, behind };
+}
+
+/** Rank after each finished week (cumulative wins, ties by historic win %): { owner: { week: rank } }. */
+export function rankHistory(lg, weeks) {
+  const s = standingsSeries(lg, weeks);
+  const out = Object.fromEntries(lg.owners.map(o => [o.name, {}]));
+  s.weeks.forEach((n, i) => [...lg.owners].sort((a, b) => s.wins[b.name][i] - s.wins[a.name][i] || b.hist - a.hist)
+    .forEach((o, r) => out[o.name][n] = r + 1));
   return out;
 }
 
@@ -121,7 +134,7 @@ export function buildContext({ idx, teamList, current, past }) {
     byLeague: {},
   };
   league.leagues.forEach(lg => {
-    ctx.byLeague[lg.id] = { lg, c: computeLeague(lg, ctx.teams), co: computeCallouts(lg, ctx.weeks), ranks: rankHistory(lg, ctx.weeks) };
+    ctx.byLeague[lg.id] = { lg, c: computeLeague(lg, ctx.teams), co: computeCallouts(lg, ctx.weeks), ranks: rankHistory(lg, ctx.weeks), series: standingsSeries(lg, ctx.weeks) };
   });
   return ctx;
 }

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import {
   computeLeague, computeCallouts, rankHistory, finalizeLeague, buildContext, ownerHistory, teamHistory,
-  tally, heatPosition, sumRec, winPct, draftFrequency, draftersOf,
+  tally, heatPosition, sumRec, winPct, draftFrequency, draftersOf, standingsSeries,
 } from "../js/calc.js";
 
 const read = p => JSON.parse(fs.readFileSync(new URL(`../data/${p}`, import.meta.url)));
@@ -84,6 +84,27 @@ test("rank history uses finished weeks only and accumulates wins", () => {
   assert.deepEqual(Object.keys(rh.A).map(Number), [1, 2]);   // week 3 is not finished
   assert.equal(rh.A[1], 1);                                  // A leads after week 1 (2 wins)
   assert.deepEqual([rh.B[2], rh.C[2], rh.A[2]], [1, 2, 3]);  // after week 2 A, B and C are level on 2; historic win % decides
+});
+
+test("standings series: cumulative wins and the gap to each week's leader, finished weeks only", () => {
+  const weeks = {
+    1: wk(true, { t1: "W", t2: "W", t3: "L", t4: "L", t5: "L", t6: "L", t7: "L", t8: "L" }),   // A 2
+    2: wk(true, { t1: "L", t2: "L", t3: "W", t4: "W", t5: "W", t6: "W", t7: "L", t8: "L" }),   // B 2, C 2
+    3: wk(false, { t7: "W", t8: "W" }),                                                          // not finished: not in the series
+  };
+  const s = standingsSeries(league(), weeks);
+  assert.deepEqual(s.weeks, [1, 2]);
+  assert.deepEqual(s.wins.A, [2, 2]);
+  assert.deepEqual(s.wins.B, [0, 2]);
+  assert.deepEqual(s.lead, [2, 2]);
+  assert.deepEqual(s.behind.A, [0, 0]);            // A led after week 1; tied for the lead after week 2
+  assert.deepEqual(s.behind.D, [-2, -2]);
+  for (const n of Object.keys(s.behind)) assert.ok(s.behind[n].every(v => v <= 0));
+});
+
+test("standings series with no finished weeks is empty, not an error", () => {
+  const s = standingsSeries(league(), { 1: wk(false, { t1: "W" }) });
+  assert.deepEqual([s.weeks, s.lead], [[], []]);
 });
 
 // ---- finishing a season ----
@@ -175,6 +196,12 @@ test("the current season builds, and wins always equal losses within a league (e
   for (const e of Object.values(ctx.byLeague)) {
     const t = sumRec(e.c.rows);
     assert.equal(t.w, t.l, `${e.lg.name}: ${t.w} wins vs ${t.l} losses`);
+    // every finished week has a leader at 0 and nobody ahead of them
+    e.series.weeks.forEach((_, i) => {
+      const gaps = Object.values(e.series.behind).map(v => v[i]);
+      assert.equal(Math.max(...gaps), 0);
+      assert.ok(gaps.every(g => g <= 0));
+    });
   }
   // history works for everyone, and for every team
   for (const lg of ctx.league.leagues) for (const o of lg.owners) assert.ok(ownerHistory(ctx, o.name).length >= 1);
