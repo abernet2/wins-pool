@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+# the full workbook has every season's money; keep it out of the public repo
+*.xlsx

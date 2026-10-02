@@ -1,18 +1,30 @@
 #!/usr/bin/env python3
 """Fetch NFL regular-season data from ESPN.
 
-Updates data/wins.json (season record per team) and data/weeks.json (each team's
-result per week: W / L / T). Only rewrites a file when its content changed, so the
-scheduled Action doesn't create empty commits. Stdlib only.
+Updates data/<season>/wins.json (record per team) and weeks.json (each team's result per
+week: W / L / T). The season is the 'current' one in data/seasons.json (or argv[1]). Only rewrites a file when its content changed, so the
+scheduled Action doesn't create empty commits. Does nothing (and succeeds) outside the
+regular season, or before ESPN has the season. Stdlib only.
 """
 import json, pathlib, sys, urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-SEASON = int(sys.argv[1]) if len(sys.argv) > 1 else 2026  # NFL season year (2026 = the 2026-27 pool)
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+def current_season_year():
+    """NFL season year to fetch: argv[1], else the 'current' season in data/seasons.json ("2026-27" -> 2026)."""
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        return int(sys.argv[1])
+    return int(json.loads((ROOT / "data" / "seasons.json").read_text())["current"][:4])
+
+SEASON = current_season_year()
 LABEL = f"{SEASON}-{(SEASON + 1) % 100:02d}"
 URL = f"https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season={SEASON}&type=2"
 SCOREBOARD = ("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
               f"?seasontype=2&dates={SEASON}")
+
+class NotAvailable(Exception):
+    """ESPN has no data for this season (yet). Not an error: the job just has nothing to do."""
 
 # ESPN abbreviation -> team name used in league.json
 TEAMS = {
@@ -25,8 +37,14 @@ TEAMS = {
     "TB": "Tampa Bay", "TEN": "Tennessee", "WSH": "Washington",
 }
 
-def fetch():
-    data = get_json(URL)
+def parse_standings(data, season=None):
+    """(teams, window) from an ESPN standings payload. window is (start, end) of the regular season, or None."""
+    season = season or SEASON
+    got = (data.get("season") or {}).get("year")
+    if got is None:
+        raise NotAvailable(f"ESPN has no {season} season yet")
+    if got != season:
+        raise SystemExit(f"ESPN returned season {got} when {season} was requested")
     teams = {}
     for conf in data["children"]:
         for e in conf["standings"]["entries"]:
@@ -37,17 +55,30 @@ def fetch():
             teams[name] = {"w": s.get("wins", 0), "l": s.get("losses", 0), "t": s.get("ties", 0)}
     if set(teams) != set(TEAMS.values()):
         raise SystemExit(f"Expected 32 teams, got {len(teams)}")
-    return teams
+    window = None
+    for yr in data.get("seasons") or []:
+        for t in yr.get("types", []):
+            if yr.get("year") == season and t.get("id") == "2" and t.get("startDate") and t.get("endDate"):
+                window = (t["startDate"], t["endDate"])
+    return teams, window
+
+def in_window(window, now, before=2, after=7):
+    """True if `now` is within the regular season, give or take a few days. No window known -> assume yes."""
+    if not window:
+        return True
+    parse = lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%MZ").replace(tzinfo=timezone.utc)
+    start, end = parse(window[0]), parse(window[1])
+    return start - timedelta(days=before) <= now <= end + timedelta(days=after)
 
 def get_json(url):
     # ESPN returns 403 for some custom User-Agents; Python's default is accepted.
     with urllib.request.urlopen(url, timeout=30) as r:
         return json.load(r)
 
-def fetch_week(week):
-    """Return (complete, {team: 'W'|'L'|'T'}) for finished games in a week."""
-    events = get_json(f"{SCOREBOARD}&week={week}")["events"]
-    results, complete = {}, True
+def parse_week(events):
+    """(complete, {team: 'W'|'L'|'T'}) for the finished games in a week. A week with no games listed is not complete."""
+    results = {}
+    complete = bool(events)
     for e in events:
         if not e["status"]["type"]["completed"]:
             complete = False
@@ -56,9 +87,14 @@ def fetch_week(week):
         scores = {c["team"]["abbreviation"]: float(c["score"]) for c in comps}
         top = max(scores.values())
         for abbr, sc in scores.items():
-            name = TEAMS[abbr]
-            results[name] = "T" if list(scores.values()).count(top) > 1 else ("W" if sc == top else "L")
+            results[TEAMS[abbr]] = "T" if list(scores.values()).count(top) > 1 else ("W" if sc == top else "L")
     return complete, results
+
+def fetch_week(week):
+    data = get_json(f"{SCOREBOARD}&week={week}")
+    if (data.get("season") or {}).get("year") != SEASON:
+        return False, {}          # ESPN has nothing for this season/week
+    return parse_week(data["events"])
 
 def fetch_weeks(existing):
     """Fetch weeks in order, skipping ones already complete, and stop at the first
@@ -85,15 +121,25 @@ def write_if_changed(path, new):
     return True
 
 def main():
-    data = pathlib.Path(__file__).resolve().parent.parent / "data" / LABEL
+    data = ROOT / "data" / LABEL
     changed = []
 
+    try:
+        teams, window = parse_standings(get_json(URL))
+    except NotAvailable as e:
+        print(f"{e}; nothing to do.")
+        return
+    if not in_window(window, datetime.now(timezone.utc)):
+        print(f"Off-season (regular season {window[0][:10]} to {window[1][:10]}); nothing to do.")
+        return
+    teams = dict(sorted(teams.items()))
+
     wins_path = data / "wins.json"
-    old = json.loads(wins_path.read_text())
-    teams = dict(sorted(fetch().items()))
+    old = json.loads(wins_path.read_text()) if wins_path.exists() else {"season": LABEL, "teams": {}}
     if teams != old["teams"]:
         old["teams"] = teams
         old["updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        data.mkdir(exist_ok=True)
         wins_path.write_text(json.dumps(old, indent=2) + "\n")
         changed.append("wins.json")
 
