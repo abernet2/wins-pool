@@ -111,6 +111,13 @@
         "Tennessee": "L",
         "Washington": "W"
       }
+    },
+    "4": {
+      "complete": false,
+      "results": {
+        "Cleveland": "W",
+        "Pittsburgh": "L"
+      }
     }
   }
 }
