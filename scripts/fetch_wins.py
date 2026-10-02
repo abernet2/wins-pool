@@ -26,16 +26,8 @@ SCOREBOARD = ("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreb
 class NotAvailable(Exception):
     """ESPN has no data for this season (yet). Not an error: the job just has nothing to do."""
 
-# ESPN abbreviation -> team name used in league.json
-TEAMS = {
-    "ARI": "Arizona", "ATL": "Atlanta", "BAL": "Baltimore", "BUF": "Buffalo", "CAR": "Carolina",
-    "CHI": "Chicago", "CIN": "Cincinnati", "CLE": "Cleveland", "DAL": "Dallas", "DEN": "Denver",
-    "DET": "Detroit", "GB": "Green Bay", "HOU": "Houston", "IND": "Indianapolis", "JAX": "Jacksonville",
-    "KC": "Kansas City", "LAC": "L.A. Chargers", "LAR": "L.A. Rams", "LV": "Las Vegas", "MIA": "Miami",
-    "MIN": "Minnesota", "NE": "New England", "NO": "New Orleans", "NYG": "N.Y. Giants", "NYJ": "N.Y. Jets",
-    "PHI": "Philadelphia", "PIT": "Pittsburgh", "SEA": "Seattle", "SF": "San Francisco",
-    "TB": "Tampa Bay", "TEN": "Tennessee", "WSH": "Washington",
-}
+# ESPN team abbreviation -> the team name used in the league files (data/teams.json is the one team list)
+TEAMS = {t["espn"]: t["name"] for t in json.loads((ROOT / "data" / "teams.json").read_text())}
 
 def parse_standings(data, season=None):
     """(teams, window) from an ESPN standings payload. window is (start, end) of the regular season, or None."""

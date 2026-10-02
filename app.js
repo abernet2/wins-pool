@@ -6,15 +6,8 @@ const ownerLink = n => `<a href="#/player/${encodeURIComponent(n)}">${esc(n)}</a
 const teamLink = n => `<a href="#/team/${encodeURIComponent(n)}">${esc(n)}</a>`;
 const $ = id => document.getElementById(id);
 
-// Short team codes for tight lists (full name on hover). Washington is WAS, as on NFL.com.
-const ABBR = {
-  "Arizona": "ARI", "Atlanta": "ATL", "Baltimore": "BAL", "Buffalo": "BUF", "Carolina": "CAR", "Chicago": "CHI",
-  "Cincinnati": "CIN", "Cleveland": "CLE", "Dallas": "DAL", "Denver": "DEN", "Detroit": "DET", "Green Bay": "GB",
-  "Houston": "HOU", "Indianapolis": "IND", "Jacksonville": "JAX", "Kansas City": "KC", "L.A. Chargers": "LAC",
-  "L.A. Rams": "LAR", "Las Vegas": "LV", "Miami": "MIA", "Minnesota": "MIN", "N.Y. Giants": "NYG", "N.Y. Jets": "NYJ",
-  "New England": "NE", "New Orleans": "NO", "Philadelphia": "PHI", "Pittsburgh": "PIT", "San Francisco": "SF",
-  "Seattle": "SEA", "Tampa Bay": "TB", "Tennessee": "TEN", "Washington": "WAS",
-};
+// Short team codes for tight lists (full name on hover), loaded from data/teams.json at startup.
+let ABBR = {};
 const teamAbbr = n => `<a href="#/team/${encodeURIComponent(n)}" title="${esc(n)}">${ABBR[n] || esc(n)}</a>`;
 
 // ---- "I'm me" (saved in this browser only) ----
@@ -40,6 +33,7 @@ const getJSON = u => fetch(u, { cache: "no-store" }).then(r => r.ok ? r.json() :
 let CTX;
 async function loadSeason() {
   const idx = await getJSON("data/seasons.json");
+  ABBR = Object.fromEntries((await getJSON("data/teams.json")).map(t => [t.name, t.abbr]));
   const season = idx.current;
   const [league, wins, weeks] = await Promise.all(["league", "wins", "weeks"].map(f => getJSON(`data/${season}/${f}.json`)));
   const ctx = { idx, season, league, wins, teams: wins.teams, weeks: weeks ? weeks.weeks : {}, all: {} };

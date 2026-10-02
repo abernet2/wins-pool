@@ -1,0 +1,162 @@
+[
+ {
+  "name": "Arizona",
+  "abbr": "ARI",
+  "espn": "ARI"
+ },
+ {
+  "name": "Atlanta",
+  "abbr": "ATL",
+  "espn": "ATL"
+ },
+ {
+  "name": "Baltimore",
+  "abbr": "BAL",
+  "espn": "BAL"
+ },
+ {
+  "name": "Buffalo",
+  "abbr": "BUF",
+  "espn": "BUF"
+ },
+ {
+  "name": "Carolina",
+  "abbr": "CAR",
+  "espn": "CAR"
+ },
+ {
+  "name": "Chicago",
+  "abbr": "CHI",
+  "espn": "CHI"
+ },
+ {
+  "name": "Cincinnati",
+  "abbr": "CIN",
+  "espn": "CIN"
+ },
+ {
+  "name": "Cleveland",
+  "abbr": "CLE",
+  "espn": "CLE"
+ },
+ {
+  "name": "Dallas",
+  "abbr": "DAL",
+  "espn": "DAL"
+ },
+ {
+  "name": "Denver",
+  "abbr": "DEN",
+  "espn": "DEN"
+ },
+ {
+  "name": "Detroit",
+  "abbr": "DET",
+  "espn": "DET"
+ },
+ {
+  "name": "Green Bay",
+  "abbr": "GB",
+  "espn": "GB"
+ },
+ {
+  "name": "Houston",
+  "abbr": "HOU",
+  "espn": "HOU"
+ },
+ {
+  "name": "Indianapolis",
+  "abbr": "IND",
+  "espn": "IND"
+ },
+ {
+  "name": "Jacksonville",
+  "abbr": "JAX",
+  "espn": "JAX"
+ },
+ {
+  "name": "Kansas City",
+  "abbr": "KC",
+  "espn": "KC"
+ },
+ {
+  "name": "L.A. Chargers",
+  "abbr": "LAC",
+  "espn": "LAC"
+ },
+ {
+  "name": "L.A. Rams",
+  "abbr": "LAR",
+  "espn": "LAR"
+ },
+ {
+  "name": "Las Vegas",
+  "abbr": "LV",
+  "espn": "LV"
+ },
+ {
+  "name": "Miami",
+  "abbr": "MIA",
+  "espn": "MIA"
+ },
+ {
+  "name": "Minnesota",
+  "abbr": "MIN",
+  "espn": "MIN"
+ },
+ {
+  "name": "N.Y. Giants",
+  "abbr": "NYG",
+  "espn": "NYG"
+ },
+ {
+  "name": "N.Y. Jets",
+  "abbr": "NYJ",
+  "espn": "NYJ"
+ },
+ {
+  "name": "New England",
+  "abbr": "NE",
+  "espn": "NE"
+ },
+ {
+  "name": "New Orleans",
+  "abbr": "NO",
+  "espn": "NO"
+ },
+ {
+  "name": "Philadelphia",
+  "abbr": "PHI",
+  "espn": "PHI"
+ },
+ {
+  "name": "Pittsburgh",
+  "abbr": "PIT",
+  "espn": "PIT"
+ },
+ {
+  "name": "San Francisco",
+  "abbr": "SF",
+  "espn": "SF"
+ },
+ {
+  "name": "Seattle",
+  "abbr": "SEA",
+  "espn": "SEA"
+ },
+ {
+  "name": "Tampa Bay",
+  "abbr": "TB",
+  "espn": "TB"
+ },
+ {
+  "name": "Tennessee",
+  "abbr": "TEN",
+  "espn": "TEN"
+ },
+ {
+  "name": "Washington",
+  "abbr": "WAS",
+  "espn": "WSH"
+ }
+]
