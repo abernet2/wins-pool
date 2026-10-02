@@ -3,7 +3,7 @@
 // promotion/relegation on the fly; once it is over those are written into data/<season>/league.json, so the
 // history pages no longer depend on the live calculation. (Past seasons imported from the workbook already have them.)
 //
-//   node scripts/finalize-season.js [season] [--dry-run] [--force]
+//   node scripts/finalize-season.js [season] [--dry-run] [--force] [--data-dir DIR]
 //
 // Run it after the last game, BEFORE switching "current" in data/seasons.json to the next season.
 import fs from "node:fs";
@@ -26,8 +26,9 @@ export function finalizeSeason(dataDir, season, { dryRun = false, force = false 
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2), flag = f => args.includes(f);
-  const dataDir = path.join(here, "..", "data");
-  const season = args.find(a => !a.startsWith("--")) || readJSON(path.join(dataDir, "seasons.json")).current;
+  const di = args.indexOf("--data-dir");
+  const dataDir = di >= 0 ? path.resolve(args[di + 1]) : path.join(here, "..", "data");
+  const season = args.find((a, i) => !a.startsWith("--") && i !== di + 1) || readJSON(path.join(dataDir, "seasons.json")).current;
   try {
     const teams = readJSON(path.join(dataDir, season, "wins.json")).teams;
     const out = finalizeSeason(dataDir, season, { dryRun: flag("--dry-run"), force: flag("--force") });
