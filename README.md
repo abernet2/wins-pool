@@ -8,7 +8,7 @@ Live: https://abernet2.github.io/wins-pool/ (GitHub Pages, served straight from 
 
 ```
 python3 scripts/serve.py        # http://localhost:8000, caching off so edits show up
-node --test tests/              # JS tests (needs Node 22+)
+node --test              # JS tests (needs Node 22+)
 python3 -m unittest discover -s tests   # Python tests
 python3 scripts/validate_data.py        # consistency check of everything under data/
 ```

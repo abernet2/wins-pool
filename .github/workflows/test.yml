@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 22
       - name: JavaScript tests (standings, tiebreaks, callouts, finalize)
-        run: node --test tests/
+        run: node --test
       - name: Python tests (fetch, importer, data validator)
         run: python3 -m unittest discover -s tests -v
       - name: Validate the data files
