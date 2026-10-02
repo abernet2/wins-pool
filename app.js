@@ -406,7 +406,8 @@ const notFound = what => `<div class="err">No such ${what}. <a href="#/">Back to
 // ---- router ----
 function render() {
   const [, kind, arg] = (location.hash || "#/").split("/");
-  const val = arg ? decodeURIComponent(arg) : null;
+  let val = arg || null;
+  try { if (arg) val = decodeURIComponent(arg); } catch (e) { /* malformed %-escape: use it as typed, it just won't match anything */ }
   const view = !kind ? dashboard(CTX)
     : kind === "player" ? playerPage(CTX, val)
     : kind === "team" ? teamPage(CTX, val)
