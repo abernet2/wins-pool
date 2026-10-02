@@ -21,6 +21,7 @@ On `localhost`, or with `?debug` in the URL, the page shows a build stamp (when 
 index.html, style.css      page shell and all styling (three themes, phone layout)
 js/calc.js                 ALL the logic: standings, tiebreaks, callouts, history. No DOM, so Node can run it too.
 js/views.js                builds the HTML for each page from a context object
+js/chart.js                the "wins behind the leader" SVG chart (league pages); colors come from --s1..--s8 per theme
 js/app.js                  startup, routing (#/player/Name, #/team/Name, #/league/1), "I'm me", theme picker
 js/util.js                 small formatting helpers
 data/seasons.json          which seasons exist and which one is "current" (live)
@@ -50,6 +51,7 @@ The page loads the JSON, `calc.js` computes everything, `views.js` renders it. F
 - **Standings rank:** most wins, then historic win % (an owner's all-time win %, kept in `league.json`).
 - **Promotion/relegation:** League 1's bottom `relegate` owners and League 2's top `promote` owners (2 each). Their tiebreak is wins, then most ties, then historic win %.
 - **Money:** everyone pays the buy-in; the pot goes to the owner(s) with the most wins, split equally if tied (this is how the sheet has paid out, e.g. 2023-24 League 1).
+- **Standings chart:** after each *finished* week, how many wins each owner is behind that week's leader (the leader is 0). Tap a line or name to focus it.
 - 🔥 / 💩: each finished week, the owner(s) with the most / fewest wins in their league. Ties share it; nobody gets one if everyone is level.
 
 **Open question:** in 2022-23 League 2 the sheet ranked Joe (31-35-2) above Evans (31-36-1), i.e. it broke the tie on wins by most ties before historic win %. The live standings use wins then historic win %, which would rank Evans first. Every other league-season matches the sheet exactly. If the pool wants ties first, change the `rows.sort` line in `computeLeague` and empty `KNOWN_RANK_DIFFERENCES` in `tests/calc.test.js`.

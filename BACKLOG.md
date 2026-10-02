@@ -31,7 +31,6 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 - A dividing line above the promotion and relegation spots, plus a "safe by N wins" gap to the cutoff.
 
 ### Context
-- Wins-over-time chart per owner.
 - Games remaining per team, and each owner's maximum possible wins.
 - Clinch and elimination markers once the math allows.
 - Head-to-head owner comparison.
@@ -48,6 +47,15 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 - Per-owner shareable URLs, like `#/owner/Jack`.
 
 ## Done
+
+- "Standings over the season" chart on the league pages: wins behind the leader after each finished week, tap-to-focus, per-theme colors, narrower layout on phones.
+
+### Chart follow-ups
+- A view switch: wins behind the leader (current) / cumulative wins / rank (bump chart).
+- On phones, a heat grid (owner x week, colored by gap to the leader) may read better than eight lines.
+- Show the chart on player pages (their line, the others faded).
+- Mark the relegation/promotion cutoff.
+- Backfill past seasons' weekly results from ESPN so every season has a chart (ESPN's 2025 weekly results matched the workbook's final records for all 32 teams), which would also give historical fire/poop totals.
 
 - Mobile layout (<=600px): no page overflow, trimmed standings columns, stacked history cards, three-across stat strips. Verified in headless Chromium at 320-600px; still worth a pass on a real phone.
 - Past seasons (2018-19 to 2025-26) imported from the workbook with `scripts/import_season.py` (.xlsx needs openpyxl). Player pages show career totals, a previous-seasons table (league, finish, record, teams) and a teams-drafted frequency table.
