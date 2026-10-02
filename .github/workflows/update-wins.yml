@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pages: write
+  actions: write   # to re-enable this workflow (see the keep-alive step)
 
 concurrency:
   group: update-wins
@@ -19,8 +20,15 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      # GitHub switches scheduled workflows off after 60 days without repo activity, which would
+      # happen every off-season. Re-enabling the workflow resets that timer; it is a no-op when active.
+      - name: Keep the schedule alive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/update-wins.yml/enable"
       - name: Fetch records from ESPN
         run: python3 scripts/fetch_wins.py
       - name: Commit and publish if changed
