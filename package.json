@@ -1,0 +1,9 @@
+{
+  "name": "wins-pool",
+  "private": true,
+  "type": "module",
+  "description": "NFL wins pool dashboard (static site; the type=module flag lets Node load the same ES modules the browser does).",
+  "scripts": {
+    "test": "node --test tests/"
+  }
+}

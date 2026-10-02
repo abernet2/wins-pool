@@ -1,6 +1,5 @@
 /* Theme tokens. :root holds the default (terminal); other themes override via [data-theme]. */
 :root {
-  --css-version: "mobile-4";
   --bg: #0a0c0a; --fg: #d7e5d2; --muted: #6f8268; --line: #1e281d; --panel: #0f130f;
   --accent: #39ff88; --promo: #39ff88; --rel: #ff4d4d;
   --heat-hi: #2ee66b; --heat-mid: #ffd23f; --heat-lo: #ff4d4d;
@@ -218,4 +217,3 @@ h2 .short, h2 .more { display: none; }
 }
 
 #build { color: var(--accent); }
-#build .stale { color: var(--rel); }
