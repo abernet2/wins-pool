@@ -185,6 +185,7 @@ tr.champ td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 /* ---- phones: make the main view fit on one screen ---- */
 h2 .short, h2 .more { display: none; }
 @media (max-width: 600px) {
+  :root { --phone: 1; }   /* marker: lets the debug stamp confirm these rules reached the browser */
   /* extra room above the first tap target; env() also clears the clock/notch if the page is ever opened as a home-screen app */
   body { padding: max(16px, env(safe-area-inset-top)) 10px 14px; }
   header { margin-bottom: 6px; padding-bottom: 5px; gap: 2px 10px; align-items: center; }
@@ -218,3 +219,4 @@ h2 .short, h2 .more { display: none; }
 }
 
 #build { color: var(--accent); }
+#build .stale { color: var(--rel); }

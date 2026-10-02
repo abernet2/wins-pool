@@ -56,11 +56,16 @@ document.addEventListener("click", e => {
 });
 window.addEventListener("hashchange", render);
 
-// ---- debug stamp: when the files were last changed, and the viewport the page sees ----
+// ---- debug stamp: which files are running, and what the browser is actually applying ----
 function stampBuild() {
-  const vp = () => `${innerWidth}×${innerHeight}${devicePixelRatio > 1 ? " @" + devicePixelRatio + "x" : ""}`;
+  const layout = () => {
+    const query = matchMedia("(max-width: 600px)").matches;                                       // does the page count as phone-sized?
+    const rules = getComputedStyle(document.documentElement).getPropertyValue("--phone").trim() === "1";   // did the phone CSS arrive?
+    return query ? (rules ? "phone layout" : '<b class="stale">phone-sized but the phone CSS is missing: stale style.css</b>') : "desktop layout (viewport over 600px)";
+  };
+  const vp = () => `${innerWidth}×${innerHeight} @${devicePixelRatio}x` + (visualViewport && Math.abs(visualViewport.scale - 1) > .01 ? ` zoom ${visualViewport.scale.toFixed(2)}` : "");
   const show = lm => { if (!$("build")) return;
-    $("build").innerHTML = (lm ? " · build " + esc(new Date(lm).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "") + ` · ${vp()}`; };
+    $("build").innerHTML = (lm ? " · build " + esc(new Date(lm).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) : "") + ` · ${vp()} · ${layout()}`; };
   fetch("js/app.js", { method: "HEAD", cache: "no-store" }).then(r => show(r.headers.get("last-modified"))).catch(() => show(null));
   window.addEventListener("resize", () => show(null));
 }
