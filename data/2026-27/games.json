@@ -1,7 +1,7 @@
 {
  "season": "2026-27",
  "source": "nflverse/nfldata games.csv",
- "updated": "2026-10-03T04:03:05Z",
+ "updated": "2026-10-03T08:27:52Z",
  "games": [
   {"week":1,"date":"2026-09-09","home":"Seattle","away":"New England","spread":3.0,"total":44.5,"homeMl":-166,"awayMl":140,"homeScore":13,"awayScore":10},
   {"week":1,"date":"2026-09-10","home":"L.A. Rams","away":"San Francisco","spread":3.5,"total":47.5,"homeMl":-218,"awayMl":180,"homeScore":7,"awayScore":27},
@@ -65,7 +65,7 @@
   {"week":4,"date":"2026-10-04","home":"San Francisco","away":"Denver","spread":3.0,"total":47.5,"homeMl":-148,"awayMl":124,"homeScore":null,"awayScore":null},
   {"week":4,"date":"2026-10-04","home":"Seattle","away":"L.A. Chargers","spread":7.0,"total":42.5,"homeMl":-375,"awayMl":295,"homeScore":null,"awayScore":null},
   {"week":4,"date":"2026-10-04","home":"Tampa Bay","away":"Green Bay","spread":-3.0,"total":39.5,"homeMl":145,"awayMl":-175,"homeScore":null,"awayScore":null},
-  {"week":4,"date":"2026-10-04","home":"Washington","away":"Indianapolis","spread":-4.5,"total":47.5,"homeMl":164,"awayMl":-198,"homeScore":null,"awayScore":null},
+  {"week":4,"date":"2026-10-04","home":"Washington","away":"Indianapolis","spread":-4.5,"total":47.5,"homeMl":170,"awayMl":-205,"homeScore":null,"awayScore":null},
   {"week":4,"date":"2026-10-05","home":"New Orleans","away":"Atlanta","spread":2.5,"total":47.5,"homeMl":-135,"awayMl":114,"homeScore":null,"awayScore":null},
   {"week":5,"date":"2026-10-08","home":"Dallas","away":"Tampa Bay","spread":9.5,"total":47.5,"homeMl":-535,"awayMl":400,"homeScore":null,"awayScore":null},
   {"week":5,"date":"2026-10-11","home":"Arizona","away":"Detroit","spread":-5.5,"total":52.5,"homeMl":200,"awayMl":-245,"homeScore":null,"awayScore":null},
