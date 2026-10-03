@@ -5,7 +5,7 @@ import fs from "node:fs";
 import {
   computeLeague, computeCallouts, rankHistory, finalizeLeague, buildContext, ownerHistory, teamHistory,
   tally, heatPosition, sumRec, winPct, draftFrequency, draftersOf, standingsSeries,
-  homeWinProb, coverResult, teamGames, lineSummary, ownerLuck,
+  homeWinProb, coverResult, teamGames, lineSummary, ownerLuck, currentWeek, weekOdds,
 } from "../js/calc.js";
 
 const read = p => JSON.parse(fs.readFileSync(new URL(`../data/${p}`, import.meta.url)));
@@ -293,4 +293,67 @@ test("buildContext carries the lines into each league's luck table, and copes wi
   }
   const without = buildContext({ ...parts, current: { ...base, games: null } });
   assert.ok(Object.values(without.byLeague).every(e => e.luck === null));
+});
+
+// ---- weekly odds ----
+test("current week is the earliest week with a game left to play", () => {
+  const done = { homeScore: 1, awayScore: 0 };
+  assert.equal(currentWeek([game({ week: 1, ...done }), game({ week: 2, ...done }), game({ week: 3 }), game({ week: 4 })]), 3);
+  assert.equal(currentWeek([game({ week: 1, ...done }), game({ week: 2, ...done })]), 2);     // everything played: the last week
+  assert.equal(currentWeek([game({ week: 2 }), game({ week: 1, homeScore: 3, awayScore: 3 })]), 2);   // a tie is a finished game
+  assert.equal(currentWeek([]), null);
+});
+
+test("week odds: each game is an owner-vs-owner matchup with win probabilities and a favorite", () => {
+  const lg = league({ relegate: 0, promote: 0 });     // A: t1,t2  B: t3,t4  C: t5,t6  D: t7,t8
+  const games = [
+    game({ week: 1, date: "2026-09-13", home: "t1", away: "t3" }),                                      // A (favored by 3) hosts B
+    game({ week: 1, date: "2026-09-13", home: "t4", away: "t2", spread: -2.5, homeMl: 120, awayMl: -140 }), // B hosts A; the away side is favored
+    game({ week: 2, home: "t5", away: "t7" }),
+  ];
+  const w = weekOdds(lg, games, 1);
+  assert.equal(w.games.length, 2);
+  const g1 = w.games.find(g => g.home === "t1"), g2 = w.games.find(g => g.home === "t4");
+  assert.deepEqual([g1.homeOwner, g1.awayOwner, g1.favorite], ["A", "B", "home"]);
+  assert.deepEqual([g2.homeOwner, g2.awayOwner, g2.favorite], ["B", "A", "away"]);
+  near(g1.pHome + g1.pAway, 1);
+  const a = w.owners.find(r => r.name === "A");
+  assert.equal(a.games, 2);
+  near(a.exp, g1.pHome + g2.pAway);
+  assert.deepEqual([a.final, a.wins], [0, 0]);
+  assert.equal(w.owners.find(r => r.name === "C").games, 0);          // C has no game in week 1
+  assert.equal(w.owners[0].exp >= w.owners[1].exp, true);              // sorted by expected wins
+});
+
+test("week odds after the games: winner, cover, upset tag, and each owner's wins so far", () => {
+  const lg = league({ relegate: 0, promote: 0 });
+  const w = weekOdds(lg, [
+    game({ week: 1, home: "t1", away: "t3", homeScore: 10, awayScore: 20 }),                              // A's favorite loses to B: not an upset (p ~ .60 > .35)
+    game({ week: 1, home: "t5", away: "t7", spread: 14, homeMl: -900, awayMl: 600, homeScore: 7, awayScore: 9 }),   // D wins as a huge underdog: upset
+  ], 1);
+  const big = w.games.find(g => g.home === "t5");
+  assert.deepEqual([big.final, big.winner, big.upset, big.cover], [true, "away", true, -1]);
+  assert.equal(w.games.find(g => g.home === "t1").upset, false);
+  const row = n => w.owners.find(r => r.name === n);
+  assert.deepEqual([row("B").wins, row("D").wins, row("A").wins, row("C").wins], [1, 1, 0, 0]);
+  assert.equal(row("A").final, 1);
+});
+
+test("week odds: a week with no lines still lists the matchups; the same owner on both sides is allowed", () => {
+  const lg = league({ relegate: 0, promote: 0 });
+  const w = weekOdds(lg, [game({ week: 9, home: "t1", away: "t2", spread: null, homeMl: null, awayMl: null })], 9);   // A owns t1 and t2
+  assert.equal(w.hasOdds, false);
+  assert.deepEqual([w.games[0].homeOwner, w.games[0].awayOwner, w.games[0].pHome, w.games[0].favorite], ["A", "A", null, null]);
+  assert.deepEqual([w.owners.find(r => r.name === "A").games, w.owners.find(r => r.name === "A").withOdds], [2, 0]);
+});
+
+test("shipped season: every game of a week lands on exactly two owners, in both leagues", () => {
+  const cur = seasons.current, games = read(`${cur}/games.json`).games;
+  for (const lg of read(`${cur}/league.json`).leagues) {
+    for (const week of [1, currentWeek(games), 18]) {
+      const w = weekOdds(lg, games, week);
+      assert.equal(w.owners.reduce((n, r) => n + r.games, 0), w.games.length * 2);
+      assert.ok(w.games.every(g => g.homeOwner && g.awayOwner));
+    }
+  }
 });

@@ -274,3 +274,43 @@ export function ownerLuck(lg, games) {
   if (!rows.some(r => r.games)) return null;
   return rows.sort((a, b) => b.diff - a.diff || a.name.localeCompare(b.name));
 }
+
+// ---- weekly odds ----
+const isFinal = g => g.homeScore != null && g.awayScore != null;
+
+/** The week to show first: the earliest week with a game still to play (this week, or the next one), else the last week. */
+export function currentWeek(games) {
+  if (!games.length) return null;
+  const open = games.filter(g => !isFinal(g)).map(g => g.week);
+  return open.length ? Math.min(...open) : Math.max(...games.map(g => g.week));
+}
+
+/**
+ * One week's odds for a league. Every league drafts all 32 teams, so each game is also a matchup between the owners of
+ * the two sides (sometimes the same owner). Returns the games (with each side's owner and win probability, plus the
+ * result and ATS outcome once final) and, per owner, how many games they have, expected wins from the odds, and wins so far.
+ */
+export function weekOdds(lg, games, week) {
+  const owner = Object.fromEntries(lg.picks.map(p => [p.team, p.owner]));
+  const list = games.filter(g => g.week === week).map(g => {
+    const ph = homeWinProb(g), final = isFinal(g);
+    const margin = final ? g.homeScore - g.awayScore : null;
+    const winner = !final ? null : margin > 0 ? "home" : margin < 0 ? "away" : "tie";
+    return {
+      ...g, homeOwner: owner[g.home], awayOwner: owner[g.away], pHome: ph, pAway: ph == null ? null : 1 - ph, final, winner,
+      favorite: g.spread == null || g.spread === 0 ? null : g.spread > 0 ? "home" : "away",
+      cover: coverResult(g),                                               // 1 home covered, -1 away covered, 0 push
+      upset: final && ph != null && ((winner === "home" && ph < .35) || (winner === "away" && 1 - ph < .35)),
+    };
+  }).sort((a, b) => (a.date || "").localeCompare(b.date || "") || a.home.localeCompare(b.home));
+
+  const rows = Object.fromEntries(lg.owners.map(o => [o.name, { name: o.name, games: 0, withOdds: 0, exp: 0, final: 0, wins: 0 }]));
+  list.forEach(g => [["home", g.homeOwner, g.pHome], ["away", g.awayOwner, g.pAway]].forEach(([side, name, p]) => {
+    const r = rows[name];
+    r.games++;
+    if (p != null) { r.withOdds++; r.exp += p; }
+    if (g.final) { r.final++; if (g.winner === side) r.wins++; }
+  }));
+  const owners = Object.values(rows).sort((a, b) => b.exp - a.exp || a.name.localeCompare(b.name));
+  return { week, games: list, owners, hasOdds: list.some(g => g.pHome != null) };
+}
