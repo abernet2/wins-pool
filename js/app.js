@@ -30,14 +30,14 @@ const getJSON = (u, fresh) => fetch(u, { cache: fresh ? "no-store" : "default" }
 
 async function load() {
   const idx = await getJSON("data/seasons.json", true);
-  const [teamList, league, wins, weeks] = await Promise.all([
-    getJSON("data/teams.json"), ...["league", "wins", "weeks"].map(f => getJSON(`data/${idx.current}/${f}.json`, true))]);
+  const [teamList, league, wins, weeks, games] = await Promise.all([
+    getJSON("data/teams.json"), ...["league", "wins", "weeks", "games"].map(f => getJSON(`data/${idx.current}/${f}.json`, true))]);
   const past = {};
   await Promise.all(idx.seasons.filter(s => s !== idx.current).map(async sn => {
     const [lg, w] = await Promise.all([getJSON(`data/${sn}/league.json`), getJSON(`data/${sn}/wins.json`)]);
     if (lg && w) past[sn] = { league: lg, teams: w.teams };
   }));
-  return buildContext({ idx, teamList, current: { league, wins, weeks }, past });
+  return buildContext({ idx, teamList, current: { league, wins, weeks, games }, past });
 }
 
 // ---- routing ----

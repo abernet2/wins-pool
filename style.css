@@ -238,3 +238,7 @@ h2 .short, h2 .more { display: none; }
 .chart[data-focus] .ch-line.on { stroke-width: 3.2; stroke-opacity: 1; }
 .ch-readout { margin-top: 6px; min-height: 2.6em; color: var(--muted); font-size: 11px; }
 [data-theme="brutalist"] .ch-grid { stroke-opacity: .22; }
+
+.neg { color: var(--rel); font-weight: 700; }
+.note { margin: 6px 0 0; max-width: 64ch; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.note a { color: inherit; text-decoration: underline; }

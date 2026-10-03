@@ -85,6 +85,17 @@ function tallyTable(rows, label, keyHtml, { keyCls = "", timesCls = "" } = {}) {
     <tbody>${body}</tbody></table>`;
 }
 
+// Wins vs what the betting lines expected, and the record against the spread, per owner (luckiest first).
+function luckTable(rows, me) {
+  const signed = d => `${d > 0 ? "+" : ""}${d.toFixed(1)}`;
+  const body = rows.map(r => `<tr class="${r.name === me ? "me" : ""}"><td class="l owner">${ownerLink(r.name)}</td>
+    <td>${r.wins}</td><td class="dim">${r.exp.toFixed(1)}</td><td class="${r.diff > 0.05 ? "pos" : r.diff < -0.05 ? "neg" : "dim"}">${signed(r.diff)}</td>
+    <td>${r.ats.w}-${r.ats.l}${r.ats.p ? "-" + r.ats.p : ""}</td><td class="dim">${r.atsPct == null ? "–" : pct(r.atsPct, 0)}</td></tr>`).join("");
+  return `<div class="tbl"><table><thead><tr><th class="l">Owner</th><th>W</th><th>Exp</th><th>+/-</th><th>ATS</th><th>ATS%</th></tr></thead>
+    <tbody>${body}</tbody></table></div>
+    <p class="note"><b>Exp</b> adds up each finished game's win probability from the betting line (the bookmaker's margin removed), so <b>+/-</b> is how many wins above or below expectation. <b>ATS</b> is the record against the spread, win-loss-push. Lines from <a href="https://github.com/nflverse/nfldata">nflverse</a>.</p>`;
+}
+
 function historyTable(ctx, hist) {
   const body = hist.map(h => {
     const mv = h.move === "promoted" ? `<span class="mv up" title="Promoted">▲</span>` : h.move === "relegated" ? `<span class="mv dn" title="Relegated">▼</span>` : "";
@@ -115,11 +126,12 @@ function dashboard(ctx, me) {
 function leaguePage(ctx, id, me, opts) {
   const e = ctx.byLeague[id];
   if (!e) return notFound("league");
-  const { lg, c, co, series, ranks } = e;
+  const { lg, c, co, series, ranks, luck } = e;
   return `<div class="crumbs">${homeCrumb(ctx)} / ${esc(lg.name)}</div>
     <section class="narrow"><h2>${esc(lg.name)}<small>${potText(lg, c)}</small></h2>
     ${strip(co)}<div class="tbl">${standingsTable(c, co, me)}</div>
     <h3>Standings over the season</h3>${standingsChart(lg, series, ranks, { me, compact: opts.compact })}
+    ${luck ? `<h3>Luck &amp; against the spread</h3>${luckTable(luck, me)}` : ""}
     <h3>Wins by week</h3><div class="tbl">${weeklyGrid(co, c.rows)}</div>
     <h3>Draft order</h3><div class="tbl">${draftTable(lg, ctx.teams, me)}</div></section>`;
 }
