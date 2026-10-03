@@ -122,19 +122,21 @@ export function finalizeLeague(lg, teams) {
 /**
  * @param idx       data/seasons.json
  * @param teamList  data/teams.json
- * @param current   { league, wins, weeks } for the current season (weeks may be null)
+ * @param current   { league, wins, weeks, games } for the current season (weeks and games may be null)
  * @param past      { "<season>": { league, teams } } for every other season
  */
 export function buildContext({ idx, teamList, current, past }) {
-  const { league, wins, weeks } = current;
+  const { league, wins, weeks, games } = current;
   const ctx = {
     idx, season: idx.current, league, wins, teams: wins.teams, weeks: weeks ? weeks.weeks : {},
     abbr: Object.fromEntries(teamList.map(t => [t.name, t.abbr])),
     all: { ...past, [idx.current]: { league, teams: wins.teams } },
+    games: games ? games.games : [],
     byLeague: {},
   };
   league.leagues.forEach(lg => {
-    ctx.byLeague[lg.id] = { lg, c: computeLeague(lg, ctx.teams), co: computeCallouts(lg, ctx.weeks), ranks: rankHistory(lg, ctx.weeks), series: standingsSeries(lg, ctx.weeks) };
+    ctx.byLeague[lg.id] = { lg, c: computeLeague(lg, ctx.teams), co: computeCallouts(lg, ctx.weeks), ranks: rankHistory(lg, ctx.weeks), series: standingsSeries(lg, ctx.weeks),
+      luck: ownerLuck(lg, ctx.games) };
   });
   return ctx;
 }
@@ -206,3 +208,69 @@ export const draftFrequency = hist =>
 /** Owners who have drafted a team, from teamHistory rows. */
 export const draftersOf = hist =>
   tally(hist.flatMap(h => Object.values(h.drafted).map(d => ({ key: d.owner, pick: d.pick, rec: h, season: h.season }))));
+
+// ---- betting lines (data/<season>/games.json) ----
+// A game: { week, home, away, spread (points the HOME team is favored by; negative = away favored; null = no line),
+//           total, homeMl, awayMl, homeScore, awayScore (null until final) }.
+
+const impliedProb = ml => (ml < 0 ? -ml / (-ml + 100) : 100 / (ml + 100));   // moneyline -> probability, bookmaker's margin included
+const normCdf = z => {                                                      // standard normal CDF (Abramowitz & Stegun 7.1.26)
+  const t = 1 / (1 + .3275911 * Math.abs(z) / Math.SQRT2);
+  const erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-z * z / 2);
+  return z >= 0 ? .5 * (1 + erf) : .5 * (1 - erf);
+};
+const NFL_MARGIN_SD = 13.5;   // typical standard deviation of an NFL game's final margin, in points
+
+/** Chance the home team wins: from the moneylines with the bookmaker's margin removed, else from the spread, else null. */
+export function homeWinProb(g) {
+  if (g.homeMl != null && g.awayMl != null) {
+    const h = impliedProb(g.homeMl), a = impliedProb(g.awayMl);
+    return h / (h + a);
+  }
+  return g.spread != null ? normCdf(g.spread / NFL_MARGIN_SD) : null;
+}
+
+/** Against the spread, from the home side's view: 1 home covered, -1 away covered, 0 push, null if not final or no line. */
+export function coverResult(g) {
+  if (g.spread == null || g.homeScore == null || g.awayScore == null) return null;
+  return Math.sign(g.homeScore - g.awayScore - g.spread);
+}
+
+/** One team's games from its own point of view (spread < 0 means the team was favored). */
+export function teamGames(games, team) {
+  return games.filter(g => g.home === team || g.away === team).map(g => {
+    const home = g.home === team, ph = homeWinProb(g), cover = coverResult(g);
+    const final = g.homeScore != null && g.awayScore != null, margin = final ? (home ? 1 : -1) * (g.homeScore - g.awayScore) : null;
+    return {
+      week: g.week, opp: home ? g.away : g.home, home, spread: g.spread == null ? null : (home ? -g.spread : g.spread),
+      p: ph == null ? null : (home ? ph : 1 - ph), final, won: final ? margin > 0 : null, tie: final && margin === 0,
+      cover: cover == null ? null : ((home ? cover : -cover) > 0 ? "W" : (home ? cover : -cover) < 0 ? "L" : "P"),
+    };
+  }).sort((a, b) => a.week - b.week);
+}
+
+/**
+ * Wins versus what the lines expected, and the record against the spread, over a set of team-games. Only finished
+ * games with a win probability count, so "wins" and "expected" always cover the same games.
+ */
+export function lineSummary(rows) {
+  const out = { games: 0, wins: 0, exp: 0, ats: { w: 0, l: 0, p: 0 } };
+  rows.forEach(r => {
+    if (r.final && r.p != null) { out.games++; out.exp += r.p; if (r.won) out.wins++; }
+    if (r.cover) out.ats[r.cover.toLowerCase()]++;
+  });
+  return { ...out, diff: out.wins - out.exp };
+}
+
+/** Per owner in a league: wins vs expected wins and ATS across their teams, luckiest first. Null when there is no data. */
+export function ownerLuck(lg, games) {
+  if (!games || !games.length) return null;
+  const teams = byOwner(lg, p => p.team);
+  const rows = lg.owners.map(o => {
+    const sum = lineSummary(teams[o.name].flatMap(t => teamGames(games, t)));
+    const decided = sum.ats.w + sum.ats.l;
+    return { name: o.name, ...sum, atsPct: decided ? sum.ats.w / decided : null };
+  });
+  if (!rows.some(r => r.games)) return null;
+  return rows.sort((a, b) => b.diff - a.diff || a.name.localeCompare(b.name));
+}

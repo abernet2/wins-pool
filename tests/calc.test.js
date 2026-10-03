@@ -5,6 +5,7 @@ import fs from "node:fs";
 import {
   computeLeague, computeCallouts, rankHistory, finalizeLeague, buildContext, ownerHistory, teamHistory,
   tally, heatPosition, sumRec, winPct, draftFrequency, draftersOf, standingsSeries,
+  homeWinProb, coverResult, teamGames, lineSummary, ownerLuck,
 } from "../js/calc.js";
 
 const read = p => JSON.parse(fs.readFileSync(new URL(`../data/${p}`, import.meta.url)));
@@ -207,4 +208,89 @@ test("the current season builds, and wins always equal losses within a league (e
   for (const lg of ctx.league.leagues) for (const o of lg.owners) assert.ok(ownerHistory(ctx, o.name).length >= 1);
   assert.ok(teamHistory(ctx, "Seattle").length >= 1);
   assert.ok(draftFrequency(ownerHistory(ctx, "Thomas")).length > 0 && draftersOf(teamHistory(ctx, "Seattle")).length > 0);
+});
+
+// ---- betting lines ----
+const game = (over = {}) => ({ week: 1, home: "t1", away: "t2", spread: 3, total: 44, homeMl: -166, awayMl: 140, homeScore: null, awayScore: null, ...over });
+const near = (a, b, eps = 1e-3) => assert.ok(Math.abs(a - b) < eps, `${a} is not within ${eps} of ${b}`);
+
+test("win probability from moneylines removes the bookmaker's margin", () => {
+  near(homeWinProb(game()), .5996);                                 // -166 / +140: implied .624 and .417 sum to more than 1
+  near(homeWinProb(game({ homeMl: -110, awayMl: -110 })), .5);
+  near(homeWinProb(game({ homeMl: 400, awayMl: -535 })) + homeWinProb(game({ homeMl: -535, awayMl: 400 })), 1);
+});
+
+test("without moneylines the spread gives a probability; with neither there is none", () => {
+  const no = { homeMl: null, awayMl: null };
+  near(homeWinProb(game({ ...no, spread: 0 })), .5);
+  assert.ok(homeWinProb(game({ ...no, spread: 7 })) > .65 && homeWinProb(game({ ...no, spread: -7 })) < .35);
+  near(homeWinProb(game({ ...no, spread: 3 })) + homeWinProb(game({ ...no, spread: -3 })), 1);
+  assert.equal(homeWinProb(game({ ...no, spread: null })), null);
+});
+
+test("against the spread: cover, push, no line and unfinished games", () => {
+  assert.equal(coverResult(game({ homeScore: 24, awayScore: 17 })), 1);    // home favored by 3, won by 7: covers
+  assert.equal(coverResult(game({ homeScore: 20, awayScore: 17 })), 0);    // won by exactly 3: push
+  assert.equal(coverResult(game({ homeScore: 20, awayScore: 19 })), -1);   // won by 1: favorite fails to cover
+  assert.equal(coverResult(game({ homeScore: 10, awayScore: 13 })), -1);   // lost outright
+  assert.equal(coverResult(game({ spread: -3, homeScore: 10, awayScore: 13 })), 0);   // home underdog by 3 lost by exactly 3: push
+  assert.equal(coverResult(game({ spread: null, homeScore: 10, awayScore: 13 })), null);
+  assert.equal(coverResult(game()), null);
+});
+
+test("team games are seen from the team's own side", () => {
+  const g = game({ homeScore: 24, awayScore: 17 });
+  const [home] = teamGames([g], "t1"), [away] = teamGames([g], "t2");
+  assert.deepEqual([home.opp, home.home, home.spread, home.won, home.cover], ["t2", true, -3, true, "W"]);   // favored by 3
+  assert.deepEqual([away.opp, away.home, away.spread, away.won, away.cover], ["t1", false, 3, false, "L"]);  // +3 and failed to cover
+  near(home.p + away.p, 1);
+});
+
+test("a tie is not a win, and an unfinished game contributes nothing", () => {
+  const s = lineSummary([...teamGames([game({ homeScore: 20, awayScore: 20 })], "t1"), ...teamGames([game({ week: 2 })], "t1")]);
+  assert.deepEqual([s.games, s.wins, s.ats.w + s.ats.l + s.ats.p], [1, 0, 1]);
+  near(s.exp, .5996);
+});
+
+test("owner luck: wins vs expected and ATS summed over an owner's teams, luckiest first", () => {
+  const lg = league({ relegate: 0, promote: 0 });      // A owns t1,t2; B owns t3,t4; ...
+  const games = [
+    game({ week: 1, home: "t1", away: "t3", homeScore: 10, awayScore: 20 }),                          // A's t1 (favorite) loses outright; B's t3 wins
+    game({ week: 1, home: "t2", away: "t4", spread: 0, homeMl: -110, awayMl: -110, homeScore: 7, awayScore: 3 }),   // A's t2 wins a coin flip (pick'em)
+    game({ week: 2, home: "t5", away: "t6" }),                                                         // not played yet
+  ];
+  const rows = ownerLuck(lg, games);
+  const get = n => rows.find(r => r.name === n);
+  assert.equal(get("A").wins, 1); near(get("A").exp, .5996 + .5);
+  assert.deepEqual(get("A").ats, { w: 1, l: 1, p: 0 });
+  assert.equal(get("B").wins, 1); near(get("B").exp, .4004 + .5);
+  assert.deepEqual(get("C").ats, { w: 0, l: 0, p: 0 });  // no finished games
+  assert.equal(get("C").atsPct, null);
+  assert.equal(rows[0].name, "B");                       // B is +0.1 over expectation, A is -0.1
+  assert.equal(ownerLuck(lg, []), null);
+});
+
+test("shipped lines: probabilities are sane, expected wins add up, and every game has one cover or a push", () => {
+  const cur = seasons.current, games = read(`${cur}/games.json`).games;
+  const finished = games.filter(g => g.homeScore != null && g.spread != null && g.homeMl != null);
+  assert.ok(finished.length > 0);
+  for (const g of games.filter(g => g.homeMl != null)) { const p = homeWinProb(g); assert.ok(p > 0 && p < 1, `${g.home} ${p}`); }
+  const teams = [...new Set(games.flatMap(g => [g.home, g.away]))];
+  const all = lineSummary(teams.flatMap(t => teamGames(games, t)));
+  near(all.exp, finished.length, 1e-6);                  // each game's two sides have probabilities that sum to 1
+  assert.equal(all.ats.w, all.ats.l);                    // one side covers, the other doesn't (pushes aside)
+  assert.equal(all.games, finished.length * 2);
+});
+
+test("buildContext carries the lines into each league's luck table, and copes with no lines file", () => {
+  const cur = seasons.current;
+  const parts = { idx: seasons, teamList: read("teams.json"), past: {} };
+  const base = { league: read(`${cur}/league.json`), wins: read(`${cur}/wins.json`), weeks: read(`${cur}/weeks.json`) };
+  const withLines = buildContext({ ...parts, current: { ...base, games: read(`${cur}/games.json`) } });
+  for (const e of Object.values(withLines.byLeague)) {
+    assert.equal(e.luck.length, 8);
+    assert.ok(e.luck.every(r => r.games > 0), "every owner has finished games");
+  }
+  const without = buildContext({ ...parts, current: { ...base, games: null } });
+  assert.ok(Object.values(without.byLeague).every(e => e.luck === null));
 });
