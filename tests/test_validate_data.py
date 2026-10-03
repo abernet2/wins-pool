@@ -64,5 +64,34 @@ class Validate(unittest.TestCase):
         self.with_weeks({"1": False, "2": True})
         self.assertTrue(any("unfinished but a later week exists" in e for e in self.errors()))
 
+    # ---- games.json (betting lines and scores) ----
+    def test_games_file_is_accepted(self):
+        self.assertTrue((self.d / "2026-27" / "games.json").exists())
+        self.assertEqual(self.errors(), [])
+
+    def test_incomplete_schedule(self):
+        self.edit("2026-27/games.json", lambda d: d["games"].pop())
+        self.assertTrue(any("complete schedule" in e for e in self.errors()))
+
+    def test_unknown_team_in_games(self):
+        self.edit("2026-27/games.json", lambda d: d["games"][0].update(home="Seatle"))
+        self.assertTrue(any("unknown team" in e for e in self.errors()))
+
+    def test_half_a_score(self):
+        def half(d): d["games"][0]["awayScore"] = None
+        self.edit("2026-27/games.json", half)
+        self.assertTrue(any("half a score" in e for e in self.errors()))
+
+    def test_live_season_disagreement_is_only_a_warning(self):
+        self.edit("2026-27/wins.json", lambda d: d["teams"]["Seattle"].update(w=d["teams"]["Seattle"]["w"] + 1))
+        errors, warnings = validate(self.d)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("disagree" in w for w in warnings))
+
+    def test_finished_season_disagreement_is_an_error(self):
+        games = json.loads((self.d / "2026-27" / "games.json").read_text()); games["season"] = "2025-26"
+        (self.d / "2025-26" / "games.json").write_text(json.dumps(games))     # these scores are not 2025-26's results
+        self.assertTrue(any("disagree" in e for e in self.errors()), self.errors())
+
 if __name__ == "__main__":
     unittest.main()

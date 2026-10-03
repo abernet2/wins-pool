@@ -3,6 +3,10 @@
 
   scripts/validate_data.py [--data-dir DIR]
 
+games.json (betting lines and scores), where present: a complete schedule over known teams, scores both-or-neither,
+and the final scores must add up to wins.json (an error for a finished season; only a warning for the live one,
+since ESPN and nflverse can be a few minutes apart after a game).
+
 Per season and league: every owner has exactly 4 picks, picks are numbered 1..n once each and cover every NFL team
 exactly once, team and owner names are known, each team's record is a non-negative W/L/T. Finished seasons must carry
 every owner's rank. The live season's weekly results must reference real teams, have no gaps, and only the last week
@@ -19,7 +23,7 @@ def validate(data):
     teams = load(data / "teams.json")
     names = [t["name"] for t in teams]
     if len(teams) != 32: err(f"teams.json: expected 32 teams, found {len(teams)}")
-    for key in ("name", "abbr", "espn"):
+    for key in ("name", "abbr", "espn", "nflverse"):
         dup = [v for v, n in Counter(t[key] for t in teams).items() if n > 1]
         if dup: err(f"teams.json: duplicate {key}: {dup}")
     known = set(names)
@@ -42,6 +46,25 @@ def validate(data):
             if not all(isinstance(r.get(k), int) and r[k] >= 0 for k in "wlt"): err(f"{season}: bad record for {t}: {r}")
 
         finished = season != idx["current"]
+        if (d / "games.json").exists():
+            games = load(d / "games.json")["games"]
+            if load(d / "games.json").get("season") != season: err(f"{season}: games.json says season {load(d / 'games.json').get('season')}")
+            per_team, played = Counter(), {t: [0, 0, 0] for t in known}
+            for x in games:
+                if x["home"] not in known or x["away"] not in known: err(f"{season} games.json: unknown team in {x['away']} @ {x['home']}"); continue
+                if not 1 <= x["week"] <= 18: err(f"{season} games.json: week {x['week']} out of range")
+                per_team.update([x["home"], x["away"]])
+                if (x["homeScore"] is None) != (x["awayScore"] is None): err(f"{season} games.json: half a score for {x['away']} @ {x['home']} week {x['week']}")
+                for k in ("spread", "total", "homeMl", "awayMl"):
+                    if x[k] is not None and not isinstance(x[k], (int, float)): err(f"{season} games.json: bad {k} for {x['away']} @ {x['home']}")
+                if x["homeScore"] is not None and x["awayScore"] is not None:
+                    h, a = x["homeScore"], x["awayScore"]; i = 0 if h > a else (2 if h == a else 1)
+                    played[x["home"]][i] += 1; played[x["away"]][(1, 0, 2)[i]] += 1
+            want = 16 if int(season[:4]) < 2021 else 17
+            if len(per_team) != 32 or any(n != want for n in per_team.values()): err(f"{season} games.json: not a complete schedule (every team should have {want} games)")
+            off = sorted(t for t, r in wins["teams"].items() if t in played and played[t] != [r["w"], r["l"], r["t"]])
+            if off: (err if finished else warnings.append)(f"{season}: games.json final scores disagree with wins.json for {off[:4]}{'...' if len(off) > 4 else ''}")
+
         if finished and not league.get("final"): warnings.append(f"{season}: finished season is not marked final (run scripts/finalize-season.js {season})")
         for lg in league["leagues"]:
             at = f"{season} {lg['name']}"

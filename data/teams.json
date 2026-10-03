@@ -2,161 +2,193 @@
  {
   "name": "Arizona",
   "abbr": "ARI",
-  "espn": "ARI"
+  "espn": "ARI",
+  "nflverse": "ARI"
  },
  {
   "name": "Atlanta",
   "abbr": "ATL",
-  "espn": "ATL"
+  "espn": "ATL",
+  "nflverse": "ATL"
  },
  {
   "name": "Baltimore",
   "abbr": "BAL",
-  "espn": "BAL"
+  "espn": "BAL",
+  "nflverse": "BAL"
  },
  {
   "name": "Buffalo",
   "abbr": "BUF",
-  "espn": "BUF"
+  "espn": "BUF",
+  "nflverse": "BUF"
  },
  {
   "name": "Carolina",
   "abbr": "CAR",
-  "espn": "CAR"
+  "espn": "CAR",
+  "nflverse": "CAR"
  },
  {
   "name": "Chicago",
   "abbr": "CHI",
-  "espn": "CHI"
+  "espn": "CHI",
+  "nflverse": "CHI"
  },
  {
   "name": "Cincinnati",
   "abbr": "CIN",
-  "espn": "CIN"
+  "espn": "CIN",
+  "nflverse": "CIN"
  },
  {
   "name": "Cleveland",
   "abbr": "CLE",
-  "espn": "CLE"
+  "espn": "CLE",
+  "nflverse": "CLE"
  },
  {
   "name": "Dallas",
   "abbr": "DAL",
-  "espn": "DAL"
+  "espn": "DAL",
+  "nflverse": "DAL"
  },
  {
   "name": "Denver",
   "abbr": "DEN",
-  "espn": "DEN"
+  "espn": "DEN",
+  "nflverse": "DEN"
  },
  {
   "name": "Detroit",
   "abbr": "DET",
-  "espn": "DET"
+  "espn": "DET",
+  "nflverse": "DET"
  },
  {
   "name": "Green Bay",
   "abbr": "GB",
-  "espn": "GB"
+  "espn": "GB",
+  "nflverse": "GB"
  },
  {
   "name": "Houston",
   "abbr": "HOU",
-  "espn": "HOU"
+  "espn": "HOU",
+  "nflverse": "HOU"
  },
  {
   "name": "Indianapolis",
   "abbr": "IND",
-  "espn": "IND"
+  "espn": "IND",
+  "nflverse": "IND"
  },
  {
   "name": "Jacksonville",
   "abbr": "JAX",
-  "espn": "JAX"
+  "espn": "JAX",
+  "nflverse": "JAX"
  },
  {
   "name": "Kansas City",
   "abbr": "KC",
-  "espn": "KC"
+  "espn": "KC",
+  "nflverse": "KC"
  },
  {
   "name": "L.A. Chargers",
   "abbr": "LAC",
-  "espn": "LAC"
+  "espn": "LAC",
+  "nflverse": "LAC"
  },
  {
   "name": "L.A. Rams",
   "abbr": "LAR",
-  "espn": "LAR"
+  "espn": "LAR",
+  "nflverse": "LA"
  },
  {
   "name": "Las Vegas",
   "abbr": "LV",
-  "espn": "LV"
+  "espn": "LV",
+  "nflverse": "LV"
  },
  {
   "name": "Miami",
   "abbr": "MIA",
-  "espn": "MIA"
+  "espn": "MIA",
+  "nflverse": "MIA"
  },
  {
   "name": "Minnesota",
   "abbr": "MIN",
-  "espn": "MIN"
+  "espn": "MIN",
+  "nflverse": "MIN"
  },
  {
   "name": "N.Y. Giants",
   "abbr": "NYG",
-  "espn": "NYG"
+  "espn": "NYG",
+  "nflverse": "NYG"
  },
  {
   "name": "N.Y. Jets",
   "abbr": "NYJ",
-  "espn": "NYJ"
+  "espn": "NYJ",
+  "nflverse": "NYJ"
  },
  {
   "name": "New England",
   "abbr": "NE",
-  "espn": "NE"
+  "espn": "NE",
+  "nflverse": "NE"
  },
  {
   "name": "New Orleans",
   "abbr": "NO",
-  "espn": "NO"
+  "espn": "NO",
+  "nflverse": "NO"
  },
  {
   "name": "Philadelphia",
   "abbr": "PHI",
-  "espn": "PHI"
+  "espn": "PHI",
+  "nflverse": "PHI"
  },
  {
   "name": "Pittsburgh",
   "abbr": "PIT",
-  "espn": "PIT"
+  "espn": "PIT",
+  "nflverse": "PIT"
  },
  {
   "name": "San Francisco",
   "abbr": "SF",
-  "espn": "SF"
+  "espn": "SF",
+  "nflverse": "SF"
  },
  {
   "name": "Seattle",
   "abbr": "SEA",
-  "espn": "SEA"
+  "espn": "SEA",
+  "nflverse": "SEA"
  },
  {
   "name": "Tampa Bay",
   "abbr": "TB",
-  "espn": "TB"
+  "espn": "TB",
+  "nflverse": "TB"
  },
  {
   "name": "Tennessee",
   "abbr": "TEN",
-  "espn": "TEN"
+  "espn": "TEN",
+  "nflverse": "TEN"
  },
  {
   "name": "Washington",
   "abbr": "WAS",
-  "espn": "WSH"
+  "espn": "WSH",
+  "nflverse": "WAS"
  }
 ]
