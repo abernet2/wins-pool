@@ -31,6 +31,9 @@ jobs:
         run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/update-wins.yml/enable"
       - name: Fetch records from ESPN
         run: python3 scripts/fetch_wins.py
+      # Betting lines are a bonus: if this fails (network, a changed file) the results update above still goes out.
+      - name: Fetch betting lines
+        run: python3 scripts/fetch_lines.py || echo "::warning::Could not refresh betting lines; continuing without them"
       - name: Validate before publishing
         run: python3 scripts/validate_data.py
       - name: Commit and publish if changed
