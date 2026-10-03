@@ -53,7 +53,8 @@ The page loads the JSON, `calc.js` computes everything, `views.js` renders it. F
 - **Checked against our own data:** nflverse's results reproduce the workbook's final record for all 32 teams in all eight past seasons, and the 2026-27 finals agree with ESPN. The validator checks that `games.json` is a complete schedule and (for finished seasons) that its scores add up to `wins.json`.
 - **`spread`** is how many points the *home* team is favored by (negative = the away team is favored). The lines are the closing lines from an unspecified book; they match DraftKings in the cases I compared.
 - **Licensing:** the repo declares no license. It is widely used and credited here, but keep use modest, and keep the stored snapshot in this repo so history doesn't depend on it staying online.
-- **What it drives today:** the "Luck & against the spread" table on league pages. *Expected wins* sum each finished game's win probability (moneylines with the bookmaker's margin removed; the spread is the fallback). *ATS* is win-loss-push against the spread. Ties are not wins, as in the pool.
+- **Weekly odds:** league pages have a week picker (◀ ▶, opening on the current week). Because each league drafts all 32 teams, every game is a matchup between two owners' teams, so it shows each game's line, both win probabilities and the two owners; the owner summary gives each owner's expected wins for the week. After a game: the score, who covered, and an "upset" tag when the winner had under a 35% chance. Lines for later weeks only appear about a week ahead.
+- **Also drives:** the "Luck & against the spread" table on league pages. *Expected wins* sum each finished game's win probability (moneylines with the bookmaker's margin removed; the spread is the fallback). *ATS* is win-loss-push against the spread. Ties are not wins, as in the pool.
 
 ## The rules as implemented (`js/calc.js`)
 

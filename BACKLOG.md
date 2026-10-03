@@ -48,10 +48,10 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Done
 
+- Weekly odds on league pages: a week picker, each game's line and win probabilities with the two owners, and per-owner expected wins for the week.
 - Betting lines for the current season (`data/2026-27/games.json`, refreshed by the update job) and a "Luck & against the spread" table on league pages: wins vs expected wins and ATS per owner.
 
 ### Betting-line follow-ups
-- Weekly matchups: each owner's games this week, who is favored, win probability, expected wins; plus games where two owners in a league own opposing teams.
 - ATS and luck on player pages and team pages (career and by season).
 - Backfill past seasons: `python3 scripts/fetch_lines.py 2018-19 ... 2025-26` (one command; needs a decision on file size, about 45 KB per season), then luckiest/unluckiest owner-seasons for the Hall of Fame/Shame.
 - Upset tags (a big underdog winning) in the weekly callouts.
