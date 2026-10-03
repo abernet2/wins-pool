@@ -2,7 +2,7 @@
 // matters, `me` (the owner the visitor picked with "I'm me", or null). No DOM access.
 import { esc, pct, money, recStr, shortYear } from "./util.js";
 import { standingsChart } from "./chart.js";
-import { heatPosition, findOwner, ownerHistory, teamHistory, draftFrequency, draftersOf, winPct, sumRec } from "./calc.js";
+import { currentWeek, weekOdds, heatPosition, findOwner, ownerHistory, teamHistory, draftFrequency, draftersOf, winPct, sumRec } from "./calc.js";
 
 // ---- links and small pieces ----
 const ownerLink = n => `<a href="#/player/${encodeURIComponent(n)}">${esc(n)}</a>`;
@@ -96,6 +96,46 @@ function luckTable(rows, me) {
     <p class="note"><b>Exp</b> adds up each finished game's win probability from the betting line (the bookmaker's margin removed), so <b>+/-</b> is how many wins above or below expectation. <b>ATS</b> is the record against the spread, win-loss-push. Lines from <a href="https://github.com/nflverse/nfldata">nflverse</a>.</p>`;
 }
 
+// ---- weekly odds ----
+const dayLabel = iso => iso ? new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric", timeZone: "UTC" }) : "";
+const pctInt = p => p == null ? "–" : Math.round(p * 100);
+
+function oddsGameRow(ctx, g, me) {
+  const A = ctx.abbr[g.away] || g.away, H = ctx.abbr[g.home] || g.home;
+  const owners = g.homeOwner === g.awayOwner
+    ? `${ownerLink(g.homeOwner)} <span class="dim">owns both</span>`
+    : `${ownerLink(g.awayOwner)} <span class="dim">·</span> ${ownerLink(g.homeOwner)}`;
+  const line = g.favorite == null ? (g.spread === 0 ? "PK" : "–") : `${g.favorite === "home" ? H : A} −${Math.abs(g.spread)}`;
+  let result = `<span class="dim">${dayLabel(g.date)}</span>`;
+  if (g.final) {
+    const hi = Math.max(g.homeScore, g.awayScore), lo = Math.min(g.homeScore, g.awayScore);
+    const who = g.winner === "tie" ? "TIE" : g.winner === "home" ? H : A;
+    const ats = g.cover == null ? "" : g.cover === 0 ? "push" : `${g.cover > 0 ? H : A} covered`;
+    result = `<b>${who} ${hi}–${lo}</b>${ats ? ` <span class="dim">· ${ats}</span>` : ""}${g.upset ? ` <span class="tag">upset</span>` : ""}`;
+  }
+  const mine = g.homeOwner === me || g.awayOwner === me;
+  return `<tr class="${mine ? "me" : ""}"><td class="l"><span class="${g.favorite === "away" ? "fav" : ""}">${A}</span> @ <span class="${g.favorite === "home" ? "fav" : ""}">${H}</span><br><small>${owners}</small></td>
+    <td>${line}</td><td class="dim">${pctInt(g.pAway)}–${pctInt(g.pHome)}</td><td class="l wrap">${result}</td></tr>`;
+}
+
+/** The inside of the weekly-odds box for one week; also what the ◀ ▶ buttons swap in. */
+export function oddsBody(ctx, leagueId, week, me) {
+  const lg = ctx.byLeague[leagueId].lg;
+  const maxWeek = Math.max(...ctx.games.map(g => g.week));
+  const w = weekOdds(lg, ctx.games, week);
+  const span = w.games.length ? `${dayLabel(w.games[0].date)} – ${dayLabel(w.games.at(-1).date)}` : "no games";
+  const owners = w.owners.map(r => `<tr class="${r.name === me ? "me" : ""}"><td class="l owner">${ownerLink(r.name)}</td><td>${r.games || "–"}</td>
+    <td>${r.withOdds ? r.exp.toFixed(1) : "–"}</td><td class="dim">${r.final ? `${r.wins} of ${r.final}` : "–"}</td></tr>`).join("");
+  return `<div class="odds-nav">
+      <button data-wk="${week - 1}" ${week <= 1 ? "disabled" : ""} aria-label="Previous week">◀</button><b>Week ${week}</b>
+      <button data-wk="${week + 1}" ${week >= maxWeek ? "disabled" : ""} aria-label="Next week">▶</button>
+      <span class="dim">${span}${w.hasOdds ? "" : " · no lines yet"}</span></div>
+    <div class="tbl"><table><thead><tr><th class="l">Owner</th><th>Games</th><th>Exp W</th><th>W so far</th></tr></thead><tbody>${owners}</tbody></table></div>
+    <div class="tbl gap"><table><thead><tr><th class="l">Game (away @ home)</th><th>Line</th><th>Win % (A–H)</th><th class="l">Result</th></tr></thead>
+      <tbody>${w.games.map(g => oddsGameRow(ctx, g, me)).join("")}</tbody></table></div>
+    <p class="note"><b>Exp W</b> adds up each side's chance of winning from the betting line (the bookmaker's margin removed). Every game is a matchup between two owners' teams. <b>Line</b> is the favorite and the points it is giving; after the game you see who covered. <b>Upset</b> means the winner had under a 35% chance.</p>`;
+}
+
 function historyTable(ctx, hist) {
   const body = hist.map(h => {
     const mv = h.move === "promoted" ? `<span class="mv up" title="Promoted">▲</span>` : h.move === "relegated" ? `<span class="mv dn" title="Relegated">▼</span>` : "";
@@ -130,6 +170,7 @@ function leaguePage(ctx, id, me, opts) {
   return `<div class="crumbs">${homeCrumb(ctx)} / ${esc(lg.name)}</div>
     <section class="narrow"><h2>${esc(lg.name)}<small>${potText(lg, c)}</small></h2>
     ${strip(co)}<div class="tbl">${standingsTable(c, co, me)}</div>
+    ${ctx.games.length ? `<h3>Weekly odds</h3><div class="odds" data-league="${lg.id}">${oddsBody(ctx, lg.id, currentWeek(ctx.games), me)}</div>` : ""}
     <h3>Standings over the season</h3>${standingsChart(lg, series, ranks, { me, compact: opts.compact })}
     ${luck ? `<h3>Luck &amp; against the spread</h3>${luckTable(luck, me)}` : ""}
     <h3>Wins by week</h3><div class="tbl">${weeklyGrid(co, c.rows)}</div>

@@ -242,3 +242,12 @@ h2 .short, h2 .more { display: none; }
 .neg { color: var(--rel); font-weight: 700; }
 .note { margin: 6px 0 0; max-width: 64ch; color: var(--muted); font-size: 11px; line-height: 1.5; }
 .note a { color: inherit; text-decoration: underline; }
+
+/* ---- weekly odds ---- */
+.odds-nav { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }
+.odds-nav b { min-width: 5.5em; text-align: center; font-family: var(--font-head); text-transform: var(--head-case); letter-spacing: var(--head-track); }
+button:disabled { opacity: .3; cursor: default; }
+button:disabled:hover { border-color: var(--line); color: var(--fg); }
+.fav { font-weight: 700; }
+.tag { font: 700 9px var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); border: var(--rule) solid var(--accent); padding: 0 4px; }
+.odds td small { font-size: 11px; }

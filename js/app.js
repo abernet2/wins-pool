@@ -1,7 +1,7 @@
 // NFL Wins Pool: a static, hash-routed page. Data lives in data/; the logic is in calc.js, the pages in views.js.
 import { esc } from "./util.js";
 import { buildContext } from "./calc.js";
-import { route } from "./views.js";
+import { route, oddsBody } from "./views.js";
 
 const $ = id => document.getElementById(id);
 const THEMES = window.THEMES;   // declared in index.html's inline script so the theme applies before first paint
@@ -68,6 +68,12 @@ function focusChart(chart, owner) {
 }
 
 document.addEventListener("click", e => {
+  const step = e.target.closest && e.target.closest(".odds [data-wk]");     // weekly odds: previous / next week
+  if (step && !step.disabled) {
+    const box = step.closest(".odds");
+    box.innerHTML = oddsBody(CTX, box.dataset.league, Number(step.dataset.wk), getMe());
+    return;
+  }
   const hit = e.target.closest && e.target.closest(".chart [data-owner]");
   if (hit) return focusChart(hit.closest(".chart"), hit.dataset.owner);
   if (!e.target.dataset || e.target.dataset.me === undefined) return;
