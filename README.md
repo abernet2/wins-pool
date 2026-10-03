@@ -29,7 +29,8 @@ data/teams.json            the 32 teams: name, display abbreviation, ESPN abbrev
 data/<season>/league.json  owners, picks (the draft), league rules (buy-in, promotion/relegation counts)
 data/<season>/wins.json    each team's record. For the live season this is overwritten by the update job.
 data/<season>/weeks.json   each team's result per week (live season only)
-scripts/                   fetch_wins.py (ESPN), import_season.py, finalize-season.js, validate_data.py, serve.py
+data/<season>/games.json   every game with its closing betting line and score (from nflverse; see below)
+scripts/                   fetch_wins.py (ESPN), fetch_lines.py (betting lines), import_season.py, finalize-season.js, validate_data.py, serve.py
 tests/                     JS (node:test) and Python (unittest) tests
 .github/workflows/         update-wins.yml (live data), test.yml (tests on every push)
 ```
@@ -44,6 +45,15 @@ The page loads the JSON, `calc.js` computes everything, `views.js` renders it. F
 - **ESPN's endpoints are unofficial** and could change. The script rejects a response for the wrong season and treats "no games listed" as not finished. If a run fails, nothing is published.
 - **Off-season:** the script does nothing outside the regular season (from ESPN's own dates). Each run also re-enables the workflow, which is meant to stop GitHub's 60-day inactivity shutdown of scheduled workflows. *That is untested; check in September that the schedule is still running (Actions tab, or `gh workflow list`).*
 - The job pushes to `main`. If you push at the same moment it rebases and retries, but `git pull` before you push your own work.
+
+## Betting lines
+
+`scripts/fetch_lines.py` copies each game's closing spread, total, moneylines and final score from [nflverse's `games.csv`](https://github.com/nflverse/nfldata) (by Lee Sharpe) into `data/<season>/games.json`. The update job runs it every time, and a failure there only raises a warning; it never blocks the results update. For an older season: `python3 scripts/fetch_lines.py 2025-26` (covers every season since 2018).
+
+- **Checked against our own data:** nflverse's results reproduce the workbook's final record for all 32 teams in all eight past seasons, and the 2026-27 finals agree with ESPN. The validator checks that `games.json` is a complete schedule and (for finished seasons) that its scores add up to `wins.json`.
+- **`spread`** is how many points the *home* team is favored by (negative = the away team is favored). The lines are the closing lines from an unspecified book; they match DraftKings in the cases I compared.
+- **Licensing:** the repo declares no license. It is widely used and credited here, but keep use modest, and keep the stored snapshot in this repo so history doesn't depend on it staying online.
+- **What it drives today:** the "Luck & against the spread" table on league pages. *Expected wins* sum each finished game's win probability (moneylines with the bookmaker's margin removed; the spread is the fallback). *ATS* is win-loss-push against the spread. Ties are not wins, as in the pool.
 
 ## The rules as implemented (`js/calc.js`)
 

@@ -4,7 +4,7 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 
 ## Requested
 
-- **ATS (against the spread) stats.** Show how each team, and so each owner, performs against the spread.
+- **ATS (against the spread) stats (partly done: league-page table).** Show how each team, and so each owner, performs against the spread.
   - Odds source (checked 2026-09-30): ESPN's unauthenticated APIs carry DraftKings odds. The scoreboard (`site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`) has spread, over/under and moneylines for upcoming games but not finished ones. The core API (`sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/{id}/competitions/{id}/odds`) returned open and close lines for a finished week 1 game, so historic spreads look available. Still to verify: coverage across all games, and how long ESPN keeps them.
   - Spread-based "ATS" needs a final score plus the closing spread per game, both of which we can get from these endpoints.
 - **Resource pages (read-only).** A hash-routed page per resource, so every view is linkable: season `#/2026-27`, league `#/2026-27/league/1`, player `#/player/Jack`, team `#/team/Buffalo`. Names in tables become links.
@@ -47,6 +47,15 @@ Feature requests and ideas for the wins pool dashboard. Move items to **Done** w
 - Per-owner shareable URLs, like `#/owner/Jack`.
 
 ## Done
+
+- Betting lines for the current season (`data/2026-27/games.json`, refreshed by the update job) and a "Luck & against the spread" table on league pages: wins vs expected wins and ATS per owner.
+
+### Betting-line follow-ups
+- Weekly matchups: each owner's games this week, who is favored, win probability, expected wins; plus games where two owners in a league own opposing teams.
+- ATS and luck on player pages and team pages (career and by season).
+- Backfill past seasons: `python3 scripts/fetch_lines.py 2018-19 ... 2025-26` (one command; needs a decision on file size, about 45 KB per season), then luckiest/unluckiest owner-seasons for the Hall of Fame/Shame.
+- Upset tags (a big underdog winning) in the weekly callouts.
+- The same nflverse file has final scores for every game, so it could also backfill past seasons' weekly results (for the standings chart on past seasons) and cross-check or replace ESPN as the live-results source.
 
 - "Standings over the season" chart on the league pages: wins behind the leader after each finished week, tap-to-focus, per-theme colors, narrower layout on phones.
 
