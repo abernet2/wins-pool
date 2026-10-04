@@ -115,9 +115,25 @@
     "4": {
       "complete": false,
       "results": {
+        "Arizona": "L",
+        "Baltimore": "W",
+        "Buffalo": "L",
+        "Chicago": "W",
+        "Cincinnati": "L",
         "Cleveland": "W",
+        "Dallas": "W",
+        "Green Bay": "W",
+        "Houston": "L",
         "Indianapolis": "W",
+        "Jacksonville": "W",
+        "L.A. Rams": "W",
+        "N.Y. Giants": "W",
+        "N.Y. Jets": "L",
+        "New England": "W",
+        "Philadelphia": "L",
         "Pittsburgh": "L",
+        "Tampa Bay": "L",
+        "Tennessee": "L",
         "Washington": "L"
       }
     }
