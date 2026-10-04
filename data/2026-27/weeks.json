@@ -116,7 +116,9 @@
       "complete": false,
       "results": {
         "Cleveland": "W",
-        "Pittsburgh": "L"
+        "Indianapolis": "W",
+        "Pittsburgh": "L",
+        "Washington": "L"
       }
     }
   }
