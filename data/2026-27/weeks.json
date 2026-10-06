@@ -113,9 +113,10 @@
       }
     },
     "4": {
-      "complete": false,
+      "complete": true,
       "results": {
         "Arizona": "L",
+        "Atlanta": "W",
         "Baltimore": "W",
         "Buffalo": "L",
         "Carolina": "W",
@@ -138,6 +139,7 @@
         "N.Y. Giants": "W",
         "N.Y. Jets": "L",
         "New England": "W",
+        "New Orleans": "L",
         "Philadelphia": "L",
         "Pittsburgh": "L",
         "San Francisco": "W",
