@@ -148,6 +148,13 @@
         "Tennessee": "L",
         "Washington": "L"
       }
+    },
+    "5": {
+      "complete": false,
+      "results": {
+        "Dallas": "L",
+        "Tampa Bay": "W"
+      }
     }
   }
 }
