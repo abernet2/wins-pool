@@ -152,10 +152,30 @@
     "5": {
       "complete": false,
       "results": {
+        "Arizona": "L",
+        "Chicago": "L",
+        "Cincinnati": "W",
+        "Cleveland": "L",
         "Dallas": "L",
+        "Denver": "W",
+        "Detroit": "W",
+        "Green Bay": "W",
+        "Houston": "W",
+        "Indianapolis": "L",
         "Jacksonville": "W",
+        "L.A. Chargers": "L",
+        "Las Vegas": "L",
+        "Miami": "L",
+        "Minnesota": "W",
+        "N.Y. Giants": "T",
+        "N.Y. Jets": "W",
+        "New England": "W",
+        "New Orleans": "L",
         "Philadelphia": "L",
-        "Tampa Bay": "W"
+        "Pittsburgh": "W",
+        "Tampa Bay": "W",
+        "Tennessee": "L",
+        "Washington": "T"
       }
     }
   }
