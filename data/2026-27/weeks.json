@@ -183,6 +183,13 @@
         "Tennessee": "L",
         "Washington": "T"
       }
+    },
+    "6": {
+      "complete": false,
+      "results": {
+        "Denver": "W",
+        "Seattle": "L"
+      }
     }
   }
 }
