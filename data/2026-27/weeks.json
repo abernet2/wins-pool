@@ -187,10 +187,24 @@
     "6": {
       "complete": false,
       "results": {
+        "Atlanta": "L",
+        "Baltimore": "L",
+        "Carolina": "W",
+        "Chicago": "W",
+        "Cleveland": "W",
         "Denver": "W",
         "Houston": "W",
+        "Indianapolis": "L",
         "Jacksonville": "L",
-        "Seattle": "L"
+        "N.Y. Giants": "L",
+        "N.Y. Jets": "L",
+        "New England": "W",
+        "New Orleans": "W",
+        "Philadelphia": "L",
+        "Pittsburgh": "W",
+        "Seattle": "L",
+        "Tampa Bay": "L",
+        "Tennessee": "W"
       }
     }
   }
