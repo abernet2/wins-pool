@@ -188,6 +188,8 @@
       "complete": false,
       "results": {
         "Denver": "W",
+        "Houston": "W",
+        "Jacksonville": "L",
         "Seattle": "L"
       }
     }
