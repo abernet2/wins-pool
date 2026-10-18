@@ -187,8 +187,10 @@
     "6": {
       "complete": false,
       "results": {
+        "Arizona": "W",
         "Atlanta": "L",
         "Baltimore": "L",
+        "Buffalo": "W",
         "Carolina": "W",
         "Chicago": "W",
         "Cleveland": "W",
@@ -196,6 +198,10 @@
         "Houston": "W",
         "Indianapolis": "L",
         "Jacksonville": "L",
+        "Kansas City": "W",
+        "L.A. Chargers": "L",
+        "L.A. Rams": "L",
+        "Las Vegas": "L",
         "N.Y. Giants": "L",
         "N.Y. Jets": "L",
         "New England": "W",
