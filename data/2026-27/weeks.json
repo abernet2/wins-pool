@@ -185,7 +185,7 @@
       }
     },
     "6": {
-      "complete": false,
+      "complete": true,
       "results": {
         "Arizona": "W",
         "Atlanta": "L",
@@ -210,9 +210,11 @@
         "New Orleans": "W",
         "Philadelphia": "L",
         "Pittsburgh": "W",
+        "San Francisco": "W",
         "Seattle": "L",
         "Tampa Bay": "L",
-        "Tennessee": "W"
+        "Tennessee": "W",
+        "Washington": "L"
       }
     }
   }
