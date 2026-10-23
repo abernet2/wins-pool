@@ -216,6 +216,13 @@
         "Tennessee": "W",
         "Washington": "L"
       }
+    },
+    "7": {
+      "complete": false,
+      "results": {
+        "Chicago": "W",
+        "New England": "L"
+      }
     }
   }
 }
