@@ -221,7 +221,9 @@
       "complete": false,
       "results": {
         "Chicago": "W",
-        "New England": "L"
+        "New England": "L",
+        "New Orleans": "L",
+        "Pittsburgh": "W"
       }
     }
   }
