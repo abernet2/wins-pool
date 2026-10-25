@@ -220,14 +220,24 @@
     "7": {
       "complete": false,
       "results": {
+        "Atlanta": "W",
+        "Baltimore": "L",
         "Carolina": "L",
         "Chicago": "W",
+        "Cincinnati": "W",
+        "Cleveland": "W",
+        "Houston": "L",
         "Indianapolis": "L",
+        "Miami": "W",
         "Minnesota": "W",
+        "N.Y. Giants": "W",
+        "N.Y. Jets": "L",
         "New England": "L",
         "New Orleans": "L",
         "Pittsburgh": "W",
-        "Tampa Bay": "W"
+        "San Francisco": "L",
+        "Tampa Bay": "W",
+        "Tennessee": "L"
       }
     }
   }
