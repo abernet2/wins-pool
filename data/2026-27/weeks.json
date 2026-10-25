@@ -220,10 +220,14 @@
     "7": {
       "complete": false,
       "results": {
+        "Carolina": "L",
         "Chicago": "W",
+        "Indianapolis": "L",
+        "Minnesota": "W",
         "New England": "L",
         "New Orleans": "L",
-        "Pittsburgh": "W"
+        "Pittsburgh": "W",
+        "Tampa Bay": "W"
       }
     }
   }
