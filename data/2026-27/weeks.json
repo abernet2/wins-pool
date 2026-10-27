@@ -218,7 +218,7 @@
       }
     },
     "7": {
-      "complete": false,
+      "complete": true,
       "results": {
         "Arizona": "L",
         "Atlanta": "W",
@@ -227,6 +227,7 @@
         "Chicago": "W",
         "Cincinnati": "W",
         "Cleveland": "W",
+        "Dallas": "W",
         "Denver": "W",
         "Detroit": "W",
         "Green Bay": "L",
@@ -241,6 +242,7 @@
         "N.Y. Jets": "L",
         "New England": "L",
         "New Orleans": "L",
+        "Philadelphia": "L",
         "Pittsburgh": "W",
         "San Francisco": "L",
         "Seattle": "W",
