@@ -249,6 +249,13 @@
         "Tampa Bay": "W",
         "Tennessee": "L"
       }
+    },
+    "8": {
+      "complete": false,
+      "results": {
+        "Carolina": "L",
+        "Green Bay": "W"
+      }
     }
   }
 }
