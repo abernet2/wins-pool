@@ -253,8 +253,10 @@
     "8": {
       "complete": false,
       "results": {
+        "Atlanta": "L",
         "Carolina": "L",
-        "Green Bay": "W"
+        "Green Bay": "W",
+        "Tampa Bay": "W"
       }
     }
   }
