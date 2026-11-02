@@ -253,10 +253,28 @@
     "8": {
       "complete": false,
       "results": {
+        "Arizona": "W",
         "Atlanta": "L",
+        "Baltimore": "L",
+        "Buffalo": "W",
         "Carolina": "L",
+        "Cincinnati": "W",
+        "Cleveland": "L",
+        "Dallas": "L",
+        "Detroit": "W",
         "Green Bay": "W",
-        "Tampa Bay": "W"
+        "Indianapolis": "L",
+        "Jacksonville": "W",
+        "L.A. Chargers": "L",
+        "L.A. Rams": "W",
+        "Las Vegas": "W",
+        "Miami": "L",
+        "Minnesota": "L",
+        "N.Y. Jets": "L",
+        "New England": "W",
+        "Pittsburgh": "W",
+        "Tampa Bay": "W",
+        "Tennessee": "L"
       }
     }
   }
