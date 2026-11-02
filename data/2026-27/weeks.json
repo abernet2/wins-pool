@@ -261,10 +261,12 @@
         "Cincinnati": "W",
         "Cleveland": "L",
         "Dallas": "L",
+        "Denver": "W",
         "Detroit": "W",
         "Green Bay": "W",
         "Indianapolis": "L",
         "Jacksonville": "W",
+        "Kansas City": "L",
         "L.A. Chargers": "L",
         "L.A. Rams": "W",
         "Las Vegas": "W",
@@ -272,9 +274,11 @@
         "Minnesota": "L",
         "N.Y. Jets": "L",
         "New England": "W",
+        "Philadelphia": "L",
         "Pittsburgh": "W",
         "Tampa Bay": "W",
-        "Tennessee": "L"
+        "Tennessee": "L",
+        "Washington": "W"
       }
     }
   }
