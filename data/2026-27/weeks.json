@@ -251,13 +251,14 @@
       }
     },
     "8": {
-      "complete": false,
+      "complete": true,
       "results": {
         "Arizona": "W",
         "Atlanta": "L",
         "Baltimore": "L",
         "Buffalo": "W",
         "Carolina": "L",
+        "Chicago": "W",
         "Cincinnati": "W",
         "Cleveland": "L",
         "Dallas": "L",
@@ -276,6 +277,7 @@
         "New England": "W",
         "Philadelphia": "L",
         "Pittsburgh": "W",
+        "Seattle": "L",
         "Tampa Bay": "W",
         "Tennessee": "L",
         "Washington": "W"
