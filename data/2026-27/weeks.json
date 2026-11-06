@@ -282,6 +282,13 @@
         "Tennessee": "L",
         "Washington": "W"
       }
+    },
+    "9": {
+      "complete": false,
+      "results": {
+        "Baltimore": "L",
+        "Jacksonville": "W"
+      }
     }
   }
 }
