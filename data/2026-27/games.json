@@ -1,7 +1,7 @@
 {
  "season": "2026-27",
  "source": "nflverse/nfldata games.csv",
- "updated": "2026-11-07T01:46:37Z",
+ "updated": "2026-11-07T08:28:58Z",
  "games": [
   {"week":1,"date":"2026-09-09","home":"Seattle","away":"New England","spread":3.0,"total":44.5,"homeMl":-166,"awayMl":140,"homeScore":13,"awayScore":10},
   {"week":1,"date":"2026-09-10","home":"L.A. Rams","away":"San Francisco","spread":3.5,"total":47.5,"homeMl":-218,"awayMl":180,"homeScore":7,"awayScore":27},
@@ -127,9 +127,9 @@
   {"week":9,"date":"2026-11-05","home":"Baltimore","away":"Jacksonville","spread":-8.5,"total":40.5,"homeMl":350,"awayMl":-455,"homeScore":10,"awayScore":33},
   {"week":9,"date":"2026-11-08","home":"Atlanta","away":"Cincinnati","spread":-3.0,"total":52.5,"homeMl":150,"awayMl":-180,"homeScore":null,"awayScore":null},
   {"week":9,"date":"2026-11-08","home":"Carolina","away":"Denver","spread":-3.0,"total":44.5,"homeMl":130,"awayMl":-155,"homeScore":null,"awayScore":null},
-  {"week":9,"date":"2026-11-08","home":"Chicago","away":"Tampa Bay","spread":6.0,"total":47.5,"homeMl":-278,"awayMl":225,"homeScore":null,"awayScore":null},
+  {"week":9,"date":"2026-11-08","home":"Chicago","away":"Tampa Bay","spread":6.0,"total":47.5,"homeMl":-285,"awayMl":230,"homeScore":null,"awayScore":null},
   {"week":9,"date":"2026-11-08","home":"Indianapolis","away":"Dallas","spread":-4.5,"total":51.5,"homeMl":185,"awayMl":-225,"homeScore":null,"awayScore":null},
-  {"week":9,"date":"2026-11-08","home":"Kansas City","away":"N.Y. Jets","spread":9.5,"total":48.5,"homeMl":-500,"awayMl":380,"homeScore":null,"awayScore":null},
+  {"week":9,"date":"2026-11-08","home":"Kansas City","away":"N.Y. Jets","spread":9.5,"total":48.5,"homeMl":-455,"awayMl":350,"homeScore":null,"awayScore":null},
   {"week":9,"date":"2026-11-08","home":"L.A. Chargers","away":"Houston","spread":-6.0,"total":40.5,"homeMl":195,"awayMl":-238,"homeScore":null,"awayScore":null},
   {"week":9,"date":"2026-11-08","home":"Miami","away":"Detroit","spread":-6.5,"total":49.5,"homeMl":235,"awayMl":-290,"homeScore":null,"awayScore":null},
   {"week":9,"date":"2026-11-08","home":"New England","away":"Green Bay","spread":3.0,"total":44.5,"homeMl":-170,"awayMl":142,"homeScore":null,"awayScore":null},
