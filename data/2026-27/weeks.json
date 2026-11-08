@@ -286,8 +286,12 @@
     "9": {
       "complete": false,
       "results": {
+        "Atlanta": "L",
         "Baltimore": "L",
-        "Jacksonville": "W"
+        "Cincinnati": "W",
+        "Detroit": "W",
+        "Jacksonville": "W",
+        "Miami": "L"
       }
     }
   }
