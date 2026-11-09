@@ -286,12 +286,32 @@
     "9": {
       "complete": false,
       "results": {
+        "Arizona": "L",
         "Atlanta": "L",
         "Baltimore": "L",
+        "Carolina": "L",
         "Cincinnati": "W",
+        "Cleveland": "L",
+        "Dallas": "W",
+        "Denver": "W",
         "Detroit": "W",
+        "Green Bay": "W",
+        "Houston": "W",
+        "Indianapolis": "L",
         "Jacksonville": "W",
-        "Miami": "L"
+        "Kansas City": "W",
+        "L.A. Chargers": "L",
+        "L.A. Rams": "W",
+        "Las Vegas": "L",
+        "Miami": "L",
+        "N.Y. Giants": "W",
+        "N.Y. Jets": "L",
+        "New England": "L",
+        "New Orleans": "W",
+        "Philadelphia": "L",
+        "San Francisco": "W",
+        "Seattle": "W",
+        "Washington": "L"
       }
     }
   }
