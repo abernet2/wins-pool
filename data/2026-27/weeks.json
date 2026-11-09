@@ -290,6 +290,7 @@
         "Atlanta": "L",
         "Baltimore": "L",
         "Carolina": "L",
+        "Chicago": "W",
         "Cincinnati": "W",
         "Cleveland": "L",
         "Dallas": "W",
@@ -311,6 +312,7 @@
         "Philadelphia": "L",
         "San Francisco": "W",
         "Seattle": "W",
+        "Tampa Bay": "L",
         "Washington": "L"
       }
     }
