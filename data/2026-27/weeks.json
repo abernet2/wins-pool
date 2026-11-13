@@ -317,6 +317,13 @@
         "Tampa Bay": "L",
         "Washington": "L"
       }
+    },
+    "10": {
+      "complete": false,
+      "results": {
+        "N.Y. Giants": "L",
+        "Washington": "W"
+      }
     }
   }
 }
