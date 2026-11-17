@@ -319,10 +319,11 @@
       }
     },
     "10": {
-      "complete": false,
+      "complete": true,
       "results": {
         "Arizona": "L",
         "Atlanta": "L",
+        "Baltimore": "L",
         "Buffalo": "W",
         "Carolina": "W",
         "Cincinnati": "W",
@@ -334,6 +335,7 @@
         "Indianapolis": "W",
         "Jacksonville": "W",
         "Kansas City": "W",
+        "L.A. Chargers": "W",
         "L.A. Rams": "W",
         "Las Vegas": "L",
         "Miami": "L",
