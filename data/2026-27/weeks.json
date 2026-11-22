@@ -354,8 +354,22 @@
     "11": {
       "complete": false,
       "results": {
+        "Arizona": "L",
+        "Baltimore": "L",
+        "Buffalo": "W",
+        "Carolina": "W",
+        "Chicago": "W",
+        "Dallas": "W",
+        "Detroit": "W",
         "Houston": "W",
-        "Indianapolis": "L"
+        "Indianapolis": "L",
+        "Kansas City": "W",
+        "Miami": "L",
+        "New Orleans": "L",
+        "Philadelphia": "W",
+        "Pittsburgh": "L",
+        "Tampa Bay": "L",
+        "Tennessee": "L"
       }
     }
   }
