@@ -381,6 +381,13 @@
         "Tennessee": "L",
         "Washington": "W"
       }
+    },
+    "12": {
+      "complete": false,
+      "results": {
+        "Green Bay": "L",
+        "L.A. Rams": "W"
+      }
     }
   }
 }
