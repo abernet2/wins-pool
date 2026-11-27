@@ -385,8 +385,12 @@
     "12": {
       "complete": false,
       "results": {
+        "Chicago": "W",
+        "Dallas": "L",
+        "Detroit": "L",
         "Green Bay": "L",
-        "L.A. Rams": "W"
+        "L.A. Rams": "W",
+        "Philadelphia": "W"
       }
     }
   }
